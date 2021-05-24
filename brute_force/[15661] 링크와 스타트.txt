@@ -29,8 +29,6 @@ public class Main {
 			return;
 		}
 
-		if(idx > n) return;
-
 		// idx번 사람을 first팀에 추가
 		first.add(idx);
 		recur(idx + 1, first, second);
