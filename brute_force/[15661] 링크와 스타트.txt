@@ -1,0 +1,62 @@
+import java.util.*;
+
+public class Main {
+
+	public static int n, ans = Integer.MAX_VALUE;
+	public static int[][] arr;
+
+	public static void recur(int idx, ArrayList<Integer> first, ArrayList<Integer> second) {
+		if(idx == n) {
+			if(first.size() == 0 || second.size() == 0) return;
+
+			// 능력치 비교
+			int sum1 = 0;
+			int sum2 = 0;
+			for(int i = 0; i < first.size(); i++) {
+				for(int j = 0; j < first.size(); j++) {
+					sum1 += arr[first.get(i)][first.get(j)];
+				}
+			}
+
+			for(int i = 0; i < second.size(); i++) {
+				for(int j = 0; j < second.size(); j++) {
+					sum2 += arr[second.get(i)][second.get(j)];
+				}
+			}
+
+			int diff = Math.abs(sum1 - sum2);
+			if(diff < ans) ans = diff;
+			return;
+		}
+
+		if(idx > n) return;
+
+		// idx번 사람을 first팀에 추가
+		first.add(idx);
+		recur(idx + 1, first, second);
+		first.remove(first.size() - 1);
+
+		// idx번 사람을 second팀에 추가
+		second.add(idx);
+		recur(idx + 1, first, second);
+		second.remove(second.size() - 1);
+	}
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		arr = new int[n][n];
+
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				arr[i][j] = sc.nextInt();
+			}
+		}
+
+		ArrayList<Integer> first = new ArrayList<>();
+		ArrayList<Integer> second = new ArrayList<>();
+
+		recur(0, first, second);
+		System.out.println(ans);
+	}
+}
