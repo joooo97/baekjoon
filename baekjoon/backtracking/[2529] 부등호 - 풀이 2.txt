@@ -1,0 +1,57 @@
+import java.util.*;
+
+public class Main {
+	public static int k;
+	public static char[] arr; // 부등호 배열
+	public static boolean[] check = new boolean[10]; // 중복 체크 배열
+	public static ArrayList<String> ans = new ArrayList<>();
+
+	// 숫자 x와 y가 부등호 c의 관계를 만족하는지 여부
+	public static boolean ok(int x, int y, char c) {
+		if(c == '<') {
+			if(x < y) return true; 
+		}
+		
+		if(c == '>') {
+			if(x > y) return true;
+		}
+		
+		return false;
+	}
+	
+	public static void recur(int idx, String num) {
+		if(idx == k + 1) {
+			ans.add(num);
+			return;
+		}
+		
+		for(int i = 0; i <= 9; i++) {
+			if(check[i]) continue; // 수가 중복된 경우 건너뛰기
+			
+			// idx가 0일 때는 앞에 비교할 수가 없으므로 수 넣기
+			// idx가 0 이상일 경우 전의 수와 비교
+			if(idx == 0 || ok(num.charAt(idx - 1) - '0', i, arr[idx - 1])) {
+				check[i] = true;
+				recur(idx + 1, num + i);
+				check[i] = false;
+			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		k = sc.nextInt();
+		arr = new char[k];
+		
+		for(int i = 0; i < k; i++) {
+			arr[i] = sc.next().charAt(0);
+		}
+		
+		recur(0, "");
+		
+		Collections.sort(ans);
+		System.out.println(ans.get(ans.size() - 1));
+		System.out.println(ans.get(0));
+
+	}
+}
