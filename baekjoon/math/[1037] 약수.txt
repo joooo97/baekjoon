@@ -1,0 +1,19 @@
+import java.util.*;
+
+public class Main {
+    
+    public static void main(String args[]) {
+    	Scanner sc = new Scanner(System.in);
+    	
+    	int n = sc.nextInt();ㅁ
+    	int[] arr = new int[n];
+    	for(int i = 0; i < n; i++) {
+    		arr[i] = sc.nextInt();
+    	}
+    	
+    	Arrays.sort(arr);
+    	
+    	// n의 약수들은 루트n을 기준으로 대칭을 이루고, 대칭을 이루는 약수들끼리의 곱은 n이 됨
+    	System.out.println(arr[0] * arr[n - 1]);
+    }
+}
