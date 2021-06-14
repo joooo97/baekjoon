@@ -1,0 +1,52 @@
+import java.util.*;
+
+public class Main {
+	
+	public static int[] arr; // 주어진 수열
+	public static int[] d; // 증가하는 부분 수열의 길이
+	public static int[] prev; // 증가하는 부분 수열에서 현재 수의 전 수의 인덱스
+	
+	public static void recur(int idx) {
+		if(idx == -1) return;
+		
+		recur(prev[idx]);
+		System.out.print(arr[idx] + " ");
+	}
+
+	public static void main(String args[]) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		arr = new int[n];
+		for(int i = 0; i < n; i++) {
+			arr[i] = sc.nextInt();
+		}
+		
+		d = new int[n];
+		prev = new int[n];
+		
+		for(int i = 0; i < n; i++) {
+			d[i] = 1; // 하나의 수도 부분 수열이므로 부분 수열의 길이는 1
+			prev[i] = -1; // 전에 올 수가 없으므로 인덱스 -1 저장
+			
+			for(int j = 0; j < i; j++) {
+				if(arr[j] < arr[i] && d[i] < d[j] + 1) {
+					d[i] = d[j] + 1;
+					prev[i] = j;
+				}
+			}
+		}
+		
+		int length = d[0]; // 가장 긴 증가하는 부분 수열의 길이
+		int idx = 0; // 가장 긴 증가하는 부분 수열의 마지막 값의 인덱스
+		for(int i = 0; i < n; i++) {
+			if(length < d[i]) {
+				length = d[i];
+				idx = i;
+			}
+		}
+		System.out.println(length);
+		
+		// 수열 출력
+		recur(idx);
+	}
+}
