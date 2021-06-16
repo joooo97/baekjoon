@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+	public static boolean[] broken = new boolean[10]; 
+	
+	// 눌러야 할 숫자 개수 리턴
+	static int check(int channel) {
+		if(channel == 0) {
+			if(broken[0]) return 0;
+			else return 1;
+		}
+		
+		int len = 0; // 누를 채널의 길이
+		while(channel > 0) {
+			if(broken[channel % 10]) return 0;
+			
+			len += 1;
+			channel /= 10;
+		}
+		return len;
+	}
+	
+    public static void main(String args[]) {
+    	Scanner sc = new Scanner(System.in);
+    	int n = sc.nextInt();
+    	int m = sc.nextInt();
+    	for(int i = 0; i < m; i++) {
+    		int num = sc.nextInt();
+    		broken[num] = true;
+    	}
+
+    	int ans = Math.abs(n - 100);
+    	
+    	for(int i = 0; i <= 1000000; i++) {
+    		int len = check(i); // 눌러야 할 숫자 개수
+    		
+    		if(len > 0) {
+    			int press_sign = Math.abs(n - i); // 눌러야 할 +,- 버튼 개수
+    			
+    			if(ans > len + press_sign)
+    				ans = len + press_sign;
+    		}
+    	}
+    	System.out.println(ans);
+    }
+}
