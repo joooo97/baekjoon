@@ -1,0 +1,67 @@
+import java.util.*;
+
+public class Main {
+	
+	// 기준칸을 뺀 3칸의 정보를 저장
+	static int[][][] block = {
+		// 파랑
+		{{0,1}, {0,2}, {0,3}},
+		{{1,0}, {2,0}, {3,0}},
+		// 노랑
+		{{0,1}, {1,0}, {1,1}},
+		// 주황
+		{{1,0}, {2,0}, {2,1}},
+		{{1,0}, {0,1}, {0,2}},
+		{{0,1}, {1,1}, {2,1}},
+		{{0,1}, {0,2}, {-1,2}},
+		{{0,1}, {1,0}, {2,0}},
+		{{1,0}, {1,1}, {1,2}},
+		{{0,1}, {-1,1}, {-2,1}},
+		{{0,1}, {0,2}, {1,2}},
+		// 초록
+		{{1,0}, {1,1}, {2,1}},
+		{{0,1}, {-1,1}, {-1,2}},
+		{{0,1}, {1,1}, {1,2}},
+		{{-1,0}, {-1,1}, {-2,1}},
+		// 분홍
+		{{0,1}, {1,1}, {0,2}},
+		{{0,1}, {-1,1}, {1,1}},
+		{{1,0}, {1,-1}, {1,1}},
+		{{1,0}, {2,0}, {1,1}},
+	};
+
+	public static void main(String args[]) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int m = sc.nextInt();
+		int[][] board = new int[n][m];
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				board[i][j] = sc.nextInt();
+			}
+		}
+		
+		int ans = 0;
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				// 19개의 테르토미노 경우의 수
+				for(int k = 0; k < 19; k++) {
+					boolean ok = true;
+					int sum = board[i][j]; // 기준 칸의 값
+					for(int l = 0; l < 3; l++) { // 나머지 3개 칸의 좌표를 확인
+						int x = i + block[k][l][0]; // x 좌표
+						int y = j + block[k][l][1]; // y 좌표
+						if(x >= 0 && x < n && y >= 0 && y < m) {
+							sum += board[x][y];
+						} else {
+							ok = false;
+							break;
+						}
+					}
+					if(ok && ans < sum) ans = sum;
+				}
+			}
+		}
+		System.out.println(ans);
+	}
+}
