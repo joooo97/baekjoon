@@ -1,0 +1,34 @@
+import java.util.*;
+
+public class Main {
+	public static int[] arr; // 수열
+	public static StringBuilder sb = new StringBuilder();
+	
+	public static void recur(int idx, int n, int m) {
+		if(idx == m) {
+			for(int i = 0; i < m; i++) {
+				sb.append(arr[i] + " ");
+			}
+			sb.append("\n");
+			return;
+		}
+		
+		for(int i = 1; i <= n; i++) {
+			// 현재 수 선택
+			arr[idx] = i;
+			recur(idx + 1, n, m);
+			// 현재 수 선택 x -> 다음 반복문에서 처리됨
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int m = sc.nextInt();
+		arr = new int[m];
+		
+		recur(0, n, m);
+		System.out.println(sb);
+	}
+}
+
