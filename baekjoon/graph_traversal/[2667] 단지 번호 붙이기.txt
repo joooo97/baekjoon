@@ -1,0 +1,65 @@
+import java.util.*;
+
+public class Main {
+	public static int n;
+	public static int[][] map;
+	public static int[][] group; // 단지 번호 저장
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+	
+	public static void dfs(int x, int y, int group_idx) {
+		// 단지 번호 저장
+		group[x][y] = group_idx;
+		
+		for(int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			
+			if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+			
+			// 집이 있고 단지 번호가 정해지지 않은 경우
+			if(map[nx][ny] == 1 && group[nx][ny] == 0) 
+				dfs(nx, ny, group_idx);
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		map = new int[n][n];
+		group = new int[n][n];
+		
+		for(int i = 0; i < n; i++) {
+			String line = sc.next();
+			for(int j = 0; j < n; j++) {
+				map[i][j] = line.charAt(j) - '0';
+			}
+		}
+		
+		// 모든 집을 돌며 dfs 진행
+		int group_idx = 0; // 단지 번호
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				// 집이 있고, 단지 번호가 정해지지 않은 경우
+				if(map[i][j] == 1 && group[i][j] == 0) {
+					dfs(i, j, ++group_idx); 
+				}
+			}
+		}
+		
+		// 각 단지별 집의 수
+		int[] cnt = new int[group_idx];
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				// 단지 번호는 1부터 시작하므로 1뺀 인덱스에 저장
+				if(group[i][j] != 0) cnt[group[i][j] - 1] += 1;
+			}
+		}
+		
+		System.out.println(group_idx); // 단지 개수
+		
+		Arrays.sort(cnt);
+		for(int i : cnt)
+			System.out.println(i);
+	}
+}
