@@ -1,0 +1,84 @@
+import java.util.*;
+
+class Node {
+	int x;
+	int y;
+	int day;
+
+	Node(int x, int y, int day) {
+		this.x = x;
+		this.y = y;
+		this.day = day;
+	}
+}
+
+public class Main {
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int m = sc.nextInt();
+		int n = sc.nextInt();
+		int[][] board = new int[n][m];
+
+		Queue<Node> q = new LinkedList<>();
+
+		int cnt = 0; // 처음부터 익었거나 존재하지 않은 토마토의 개수(1 / -1)
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				board[i][j] = sc.nextInt();
+
+				if(board[i][j] == 1) {
+					q.offer(new Node(i, j, 0)); // 익은 토마토인 경우 큐에 넣기
+					cnt += 1;
+				}
+				else if(board[i][j] == -1) cnt += 1;
+			}
+		}
+
+		// 처음부터 토마토가 모두 익은 경우
+		if(cnt == n * m) {
+			System.out.println(0);
+			System.exit(0);
+		}
+
+		while(!q.isEmpty()) {
+			Node now = q.poll(); // 익은 토마토를 꺼내기
+			int x = now.x;
+			int y = now.y;
+			int day = now.day;
+
+			for(int i = 0; i < 4; i++) {
+				int nx = x + dx[i];
+				int ny = y + dy[i];
+
+				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+
+				if(board[nx][ny] == 0) { // 안 익은 토마토라면
+					board[nx][ny] =  day + 1; // 일수 기록
+					q.offer(new Node(nx, ny, day + 1));
+				}
+			}
+		}
+
+		// 일수 확인
+		int ans = 0;
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				if(ans < board[i][j]) ans = board[i][j];
+			}
+		}
+
+		// 모두 익지 못하는 상황인지 확인
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				if(board[i][j] == 0) // 안 익은 토마토가 존재한다면
+					ans = -1;
+			}
+		}
+
+		System.out.println(ans);
+	}
+
+}
