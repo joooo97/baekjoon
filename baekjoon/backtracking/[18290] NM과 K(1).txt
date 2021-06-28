@@ -1,0 +1,58 @@
+import java.util.*;
+
+public class Main {
+	public static int n, m, k;
+	public static int ans = Integer.MIN_VALUE;
+	public static int[][] board;
+	public static boolean[][] choose;
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+	
+	// px: 이전에 선택한 칸의 x좌표, py: 아전에 선택한 칸의 y좌표
+	public static void recur(int px, int py, int cnt, int sum) {
+		if(cnt == k) {
+			if(ans < sum) ans = sum;
+			return;
+		}
+		
+		for(int x = px; x < n; x++) {
+			// x == px일 때 py+1부터 진행할 경우 처음(0,0)은 확인하지 않게 됨
+			for(int y = (x == px ? py : 0); y < m; y++) {
+				if(choose[x][y]) continue;
+				
+				boolean check = true;
+				for(int i = 0; i < 4; i++) {
+					int nx = x + dx[i];
+					int ny = y + dy[i];
+					if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+					if(choose[nx][ny]) check = false;
+				}
+				
+				if(check) {
+					choose[x][y] = true;
+					recur(x, y, cnt + 1, sum + board[x][y]);
+					choose[x][y] = false;
+				}
+			}
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		m = sc.nextInt();
+		k = sc.nextInt();
+		board = new int[n][m];
+		choose = new boolean[n][m];
+		
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				board[i][j] = sc.nextInt();
+			}
+		}
+		
+		recur(0, 0, 0, 0);
+		System.out.println(ans);
+	}
+
+}
