@@ -1,0 +1,55 @@
+import java.util.*;
+
+public class Main {
+	public static int[] prev;
+	public static StringBuilder sb = new StringBuilder();
+	
+	public static void print(int n, int k) {
+		if(n != k) print(n, prev[k]);
+
+		sb.append(k + " ");
+	}
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int k = sc.nextInt();
+		int[] second = new int[100001];
+		prev = new int[100001]; // 이전의 점 기록
+		
+		Arrays.fill(second, -1);
+		
+		// 시작 점 n에 대해 처리
+		Queue<Integer> q = new LinkedList<>();
+		q.offer(n);
+		second[n] = 0;
+		
+		while(!q.isEmpty()) {
+			int x = q.poll();
+			
+			// 3가지 이동 좌표 확인
+			if(x-1 >= 0 && x-1 <= 100000 && second[x-1] == -1) {
+				q.offer(x-1);
+				second[x-1] = second[x] + 1;
+				prev[x-1] = x; // 이전 점 기록
+			}
+			
+			if(x+1 <= 100000 && second[x+1] == -1) {
+				q.offer(x+1);
+				second[x+1] = second[x] + 1;
+				prev[x+1] = x;
+			}
+			
+			if(x*2 <= 100000 && second[x*2] == -1) {
+				q.offer(x*2);
+				second[x*2] = second[x] + 1;
+				prev[x*2] = x;
+			}
+		}
+		System.out.println(second[k]);
+		
+		print(n, k); // 점 n에서 점 k까지의 이동 경로 출력
+		System.out.println(sb);
+	}
+
+}
