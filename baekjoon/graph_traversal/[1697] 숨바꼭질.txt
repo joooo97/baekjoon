@@ -1,0 +1,39 @@
+import java.util.*;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n = sc.nextInt();
+		int k = sc.nextInt();
+		boolean[] visited = new boolean[100001];
+		int[] second = new int[100001];
+		
+		// 시작 지점 n에 대해 처리
+		Queue<Integer> q = new LinkedList<>();
+		visited[n] = true;
+		q.offer(n);
+
+		while(!q.isEmpty()) {
+			int now = q.poll();
+
+			// 3가지 이동 좌표 확인
+			if(now - 1 >= 0 && now - 1 <= 100000 && !visited[now - 1]) {
+				visited[now - 1] = true;
+				q.offer(now - 1);
+				second[now - 1] = second[now] + 1;
+			}
+			if(now + 1 >= 0 && now + 1 <= 100000 && !visited[now + 1]) {
+				visited[now + 1] = true;
+				q.offer(now + 1);
+				second[now + 1] = second[now] + 1;
+			}
+			if(now * 2 >= 0 && now * 2 <= 100000 && !visited[now * 2]) {
+				visited[now * 2] = true;
+				q.offer(now * 2);
+				second[now * 2] = second[now] + 1;
+			}
+		}
+		System.out.println(second[k]);
+	}
+}
