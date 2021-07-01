@@ -18,7 +18,7 @@ public class Main {
 			int x = q.poll();
 			
 			// 3가지 이동 좌표 확인
-			if(x-1 >= 0 && x-1 <= 100000 && second[x-1] == -1) {
+			if(x-1 >= 0 && second[x-1] == -1) {
 				q.offer(x-1);
 				second[x-1] = second[x] + 1;
 			}
