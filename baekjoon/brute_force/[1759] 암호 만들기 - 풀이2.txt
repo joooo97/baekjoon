@@ -1,0 +1,54 @@
+import java.util.*;
+
+// L자리 암호
+// C개의 문자
+// 최소 모음 1개, 자음 2개
+// 증가 순
+public class Main {
+	public static int l, c;
+	public static char[] charArr;
+	public static String[] passwordArr;
+	
+	public static boolean check(String password) {
+		int ja = 0;
+		int mo = 0;
+		
+		for(char c : password.toCharArray()) {
+			if(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u')
+				mo += 1;
+			else
+				ja += 1;
+		}
+		return ja >= 2 && mo >= 1;
+	}
+	
+	public static void recur(int idx, int start, String password) {
+//		if(password.length() == l) {
+		if(idx == l) {
+			if(check(password))
+				System.out.println(password);
+			return;
+		}
+		
+		for(int i = start; i < c; i++) {
+			recur(idx + 1, i + 1, password + charArr[i]);
+		}
+	}
+ 
+    public static void main(String[] args) {
+    	Scanner sc = new Scanner(System.in);
+    	l = sc.nextInt(); // 암호 길이
+    	c = sc.nextInt(); // 문자 종류 개수
+    	charArr = new char[c];
+    	
+    	for(int i = 0; i < c; i++) {
+    		charArr[i] = sc.next().charAt(0);
+    	}
+    	
+    	Arrays.sort(charArr);
+    	
+    	recur(0, 0, "");
+    
+     }
+
+}
