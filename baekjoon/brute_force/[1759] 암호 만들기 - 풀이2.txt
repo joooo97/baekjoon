@@ -7,7 +7,6 @@ import java.util.*;
 public class Main {
 	public static int l, c;
 	public static char[] charArr;
-	public static String[] passwordArr;
 	
 	public static boolean check(String password) {
 		int ja = 0;
