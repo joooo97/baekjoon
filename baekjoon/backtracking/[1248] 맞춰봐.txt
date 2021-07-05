@@ -1,0 +1,76 @@
+import java.util.*;
+
+// A[i]: i번째 쓴 수 (-10 ~ 10)
+// S[i][j]: A[i] ~ A[j]까지의 합
+// 답 하나만 출력 후 종료
+public class Main {
+	public static int n;
+	public static int[][] sign;
+	public static int[] arr; // 수열
+	
+	// 수열의 idx번째 수를 정했을 때 조건 만족하는지 확인
+	public static boolean check(int idx) {
+		int sum = 0;
+		for(int i = idx; i >= 0; i--) {
+			sum += arr[i];
+			
+			if(sign[i][idx] == 0) { // 부호가 0인 경우
+				if(sum != 0) return false;
+			} else if(sign[i][idx] == 1) { // 부호가 +인 경우
+				if(sum <= 0) return false;
+			} else { // 부호가 -인 경우
+				if(sum >= 0) return false;
+			}
+		}
+		return true;
+	}
+	
+	// idx: 수열의 인덱스
+	public static void recur(int idx) {
+		// 수열 출력 후 종료
+		if(idx == n) {
+			for(int i : arr) {
+				System.out.print(i + " ");
+			}
+			System.exit(0);
+		}
+		
+		// sign[idx][idx]의 부호가 0인 경우
+		// 수열의 idx번째 수에 0 저장 후 수열의 다음 수 구하기
+		if(sign[idx][idx] == 0) {
+			arr[idx] = 0;
+			recur(idx + 1);
+		}
+		else { // 0이 아닌 경우
+			// 부호에 따라 값을 넣어보며 조건 만족하는지 확인
+			for(int i = 1; i <= 10; i++) {
+				arr[idx] = sign[idx][idx] * i;
+				if(check(idx)) recur(idx + 1);
+			}
+		}
+		
+	}
+	
+    public static void main(String args[]) {
+    	Scanner sc = new Scanner(System.in);
+    	n = sc.nextInt();
+    	sign = new int[n][n];
+    	arr = new int[n];
+    	String line = sc.next();
+    	
+    	int idx = 0; // 입력 부호 인덱스
+    	for(int i = 0; i < n; i++) {
+    		for(int j = i; j < n; j++) {
+    			char x = line.charAt(idx);
+    			
+    			if(x == '0') sign[i][j] = 0;
+    			else if(x == '+') sign[i][j] = 1;
+    			else sign[i][j] = -1;
+    			
+    			idx += 1;
+    		}
+    	}
+    	
+    	recur(0);
+    }
+}
