@@ -5,7 +5,7 @@ public class Main {
 	public static int n;
 	public static int[] arr; // 순열
 	
-	public static boolean next_permutation() {
+	public static boolean nextPermutation() {
 		// arr[i-1]로 끝나는 마지막 순열 찾기
 		// 뒤에서부터 arr[i-1] < arr[i]인 경우 찾기
 		int i = n-1;
