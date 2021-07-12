@@ -1,0 +1,67 @@
+import java.io.*;
+import java.util.*;
+
+public class Main {
+	// 우, 하, 좌, 상의 순서로 확인
+	public static int[] dx = {0, 1, 0, -1}; 
+	public static int[] dy = {1, 0, -1, 0};
+	
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+	    int n = Integer.parseInt(st.nextToken());
+	    int m = Integer.parseInt(st.nextToken());
+	    int r = Integer.parseInt(st.nextToken());
+        int[][] arr = new int[n][m];
+        
+        for(int i = 0; i < n; i++) {
+        	st = new StringTokenizer(br.readLine());
+        	for(int j = 0; j < m; j++) {
+        		arr[i][j] = Integer.parseInt(st.nextToken());
+        	}
+        }
+        
+        // 전체 그룹의 개수
+        // - 배열의 행, 열의 길이 중 최소값을 반으로 나눈 만큼 만들어짐
+        int group_n = Math.min(n, m) / 2;
+        
+        // r번의 회전 진행
+        while(r-- > 0) {
+        	// 각 그룹에 대해 처리
+        	for(int g = 0; g < group_n; g++) {
+        		// 각 그룹 별 시작 칸의 x, y좌표는 그룹 번호
+        		// - 0그룹 시작 칸: (0, 0) / 1그룹 시작 칸: (1, 1) ...
+        		int x = g;
+        		int y = g;
+        		// 각 그룹별 시작 칸의 값은 지워지므로 기록해 둠
+        		int start_value = arr[x][y];
+        		
+        		int d_idx = 0; // 방향 인덱스
+        		while(d_idx < 4) {
+        			// 다음 좌표: 현재 칸으로 이동해올 칸의 좌표
+        			int nx = x + dx[d_idx];
+        			int ny = y + dy[d_idx];
+        			
+        			if(nx >= g && nx < n-g && ny >= g && ny < m-g) {
+        				arr[x][y] = arr[nx][ny]; // 다음 좌표가 그룹의 범위를 벗어나지 않는다면 현재 칸으로 이동
+        				x = nx;
+        				y = ny;
+        			}
+        			else d_idx++; // 범위를 벗어나면 방향 바꾸기
+        		}
+        		// 그룹의 모든 칸의 이동이 끝난 후 시작 칸이 이동해야 할 칸에 시작 칸의 값 넣어주기
+        		arr[g+1][g] = start_value;
+        	}
+        }
+        
+        // 회전 후 배열 출력
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < n; i++) {
+        	for(int j = 0; j < m; j++) {
+        		sb.append(arr[i][j] + " ");
+        	}
+        	sb.append("\n");
+        }
+        System.out.println(sb);
+    }
+}
