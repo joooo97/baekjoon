@@ -1,0 +1,85 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int[][] arr = new int[4][8]; // 톱니바퀴 상태
+
+		// N극: 0, S극: 1
+		for(int i = 0; i < 4; i++) {
+			String line = br.readLine();
+			for(int j = 0; j < 8; j++) {
+				arr[i][j] = line.charAt(j) - '0';
+			}
+		}
+
+		// 회전 방향 - 1: 시계, 2: 반시계
+		int k = Integer.parseInt(br.readLine());
+
+		while(k-- > 0) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int idx = Integer.parseInt(st.nextToken()) - 1; // 회전할 톱니바퀴 번호
+			int dir = Integer.parseInt(st.nextToken()); // 회전 방향
+
+			// 각 톱니바퀴가 회전해야 할 방향
+			int[] d = new int[4];
+			d[idx] = dir;
+
+			// 회전할 톱니바퀴의 왼쪽 톱니바퀴들의 회전 방향 저장
+			for(int i = idx; i > 0; i--) {
+				// 현재 톱니바퀴의 왼쪽 톱니(6번 인덱스 톱니)와 왼쪽 톱니바퀴의 오른쪽 톱니(2번 인덱스 톱니)의 극을 비교
+				if(arr[i][6] != arr[i-1][2]) 
+					d[i-1] = -d[i]; // 왼쪽 톱니바퀴의 회전 방향 저장
+				else
+					break; // 인접해있는 톱니가 회전하지 않으면 회전 x
+			}
+			
+			// 회전할 톱니바퀴의 오른쪽 톱니바퀴들의 회전 방향 저장
+			for(int i = idx; i <= 2; i++) {
+				// 현재 톱니바퀴의 오른쪽 톱니(2번 인덱스 톱니)와 오른쪽 톱니바퀴의 왼쪽 톱니(6번 인덱스 톱니)의 극을 비교
+				if(arr[i][2] != arr[i+1][6])
+					d[i+1] = -d[i]; // 오른쪽 톱니바퀴의 회전 방향 저장
+				else
+					break;
+			}
+			
+			// 톱니바퀴 회전
+			for(int i = 0; i < 4; i++) {
+				if(d[i] == 0) continue;
+				
+				// 시계 방향인 경우
+				if(d[i] == 1) {
+					// 값이 지워질 마지막 톱니 기록
+					int tmp = arr[i][7];
+					for(int j = 7; j > 0; j--) {
+						arr[i][j] = arr[i][j-1];
+					}
+					// 마지막 톱니를 첫 번째 자리로 이동
+					arr[i][0] = tmp;
+				} else if(d[i] == -1) { // 반시계 방향인 경우
+					// 값이 지워질 첫 번째 톱니 기록
+					int tmp = arr[i][0];
+					for(int j = 0; j < 7; j++) {
+						arr[i][j] = arr[i][j+1];
+					}
+					// 첫 번째 톱니를 마지막 자리로 이동
+					arr[i][7] = tmp;
+				}
+			}
+			
+		} // while문
+		
+		// 점수의 합 구하기
+		int sum = 0;
+		int score = 1;
+		for(int i = 0; i < 4; i++) {
+			if(arr[i][0] == 1)
+				sum += score;
+			score *= 2;
+		}
+		
+		System.out.println(sum);
+	}
+}
