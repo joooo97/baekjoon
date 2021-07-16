@@ -1,0 +1,70 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		int t = Integer.parseInt(br.readLine()); // 톱니바퀴 개수
+		int[][] arr = new int[t][8]; // 톱니바퀴 정보
+		
+		// N극: 0, S극: 1
+		for(int i = 0; i < t; i++) {
+			String line = br.readLine();
+			for(int j = 0; j < 8; j++) {
+				arr[i][j] = line.charAt(j) - '0';
+			}
+		}
+		
+		int k = Integer.parseInt(br.readLine()); // 회전 횟수
+		while(k-- > 0) {
+			StringTokenizer st = new StringTokenizer(br.readLine());
+			int idx = Integer.parseInt(st.nextToken()) - 1; // 회전할 톱니바퀴 번호
+			int dir = Integer.parseInt(st.nextToken()); // 회전할 방향
+			
+			int[] turn = new int[t]; // 각 톱니바퀴 별 회전 방향
+			turn[idx] = dir;
+			
+			// 왼쪽 방향의 톱니바퀴들 확인
+			for(int i = idx; i > 0; i--) {
+				if(arr[i][6] != arr[i-1][2]) 
+					turn[i-1] = -turn[i];
+				else
+					break;
+			}
+			
+			// 오른쪽 방향의 톱니바퀴들 확인
+			for(int i = idx; i < t-1; i++) {
+				if(arr[i][2] != arr[i+1][6])
+					turn[i+1] = -turn[i];
+				else
+					break;
+			}
+			
+			// 회전
+			for(int i = 0; i < t; i++) {
+				if(turn[i] == 0) continue; // 회전x
+				
+				if(turn[i] == 1) { // 시계 방향
+					int tmp = arr[i][7];
+					for(int j = 7; j > 0; j--) {
+						arr[i][j] = arr[i][j-1];
+					}
+					arr[i][0] = tmp;
+				} else if(turn[i] == -1) { // 반시계 방향
+					int tmp = arr[i][0];
+					for(int j = 0; j < 7; j++) {
+						arr[i][j] = arr[i][j+1];
+					}
+					arr[i][7] = tmp;
+				}
+			}
+		} // while
+		
+		int ans = 0;
+		for(int i = 0; i < t; i++) {
+			if(arr[i][0] == 1) ans += 1;
+		}
+		System.out.println(ans);
+	}
+}
