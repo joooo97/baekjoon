@@ -1,0 +1,77 @@
+import java.util.*;
+
+// 한 번 갔던 도시로 갈 수 x
+// 비용은 대칭적x
+// 비용이 0인 경우 도시 간 이동 x
+public class Main {
+	public static int n;
+	public static int ans = Integer.MAX_VALUE;
+	public static int[] arr; // 수열
+	public static int[][] w; // 비용
+	
+	public static boolean nextPermutation() {
+		int i = n-1;
+		while(i > 0 && arr[i-1] >= arr[i]) i--;
+		
+		if(i <= 0) return false;
+		
+		int j = n-1;
+		while(arr[i-1] >= arr[j]) j--;
+		
+		int tmp = arr[i-1];
+		arr[i-1] = arr[j];
+		arr[j] = tmp;
+		
+		j = n-1;
+		while(i < j) {
+			tmp = arr[i];
+			arr[i] = arr[j];
+			arr[j] = tmp;
+			i++;
+			j--;
+		}
+		return true;
+	}
+	
+	public static void getCost() {
+		int sum = 0;
+		// 첫 도시 ~ 마지막 도시까지의 비용의 합
+		for(int i = 0; i < n-1; i++) {
+			int d = w[arr[i]][arr[i+1]];
+			
+			if(d == 0) return;
+			else sum += d;
+		}
+		// 마지막 도시 - 첫 도시까지의 비용 합하기
+		int d = w[arr[n-1]][arr[0]];
+		if(d != 0) {
+			sum += d;
+			// 최소 비용 갱신
+			if(ans > sum) ans = sum;
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		w = new int[n][n];
+		arr = new int[n];
+		
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				w[i][j] = sc.nextInt();
+			}
+		}
+		
+		// 첫 순열 만들기
+		for(int i = 0; i < n; i++) {
+			arr[i] = i;
+		}
+		
+		do {
+			getCost();
+		} while(nextPermutation());
+		
+		System.out.println(ans);
+	}
+}
