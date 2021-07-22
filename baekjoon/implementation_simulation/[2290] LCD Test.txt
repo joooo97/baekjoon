@@ -1,0 +1,75 @@
+import java.util.*;
+ 
+public class Main {
+    static String[][] board; // 숫자를 선으로 표시할 배열
+    
+    // arr[i][j] = 숫자 i를 나타내기 위한 j번 선의 존재 유무
+    static int[][] arr = {
+            {1, 1, 1, 0, 1, 1, 1},
+            {0, 0, 1, 0, 0, 1, 0},
+            {1, 0, 1, 1, 1, 0, 1},
+            {1, 0, 1, 1, 0, 1, 1},
+            {0, 1, 1, 1, 0, 1, 0},
+            {1, 1, 0, 1, 0, 1, 1},
+            {1, 1, 0, 1, 1, 1, 1},
+            {1, 0, 1, 0, 0, 1, 0},
+            {1, 1, 1, 1, 1, 1, 1},
+            {1, 1, 1, 1, 0, 1, 1}
+        };
+    
+    // 선 그리기 (매개변수: 시작 행, 끝 행, 시작 열, 끝 열, 그릴 선)
+    public static void drawLine(int start_row, int end_row, int start_col, int end_col, String line) {
+        for (int i = start_row; i <= end_row; i++) {
+        	for (int j = start_col; j <= end_col; j++) {
+        		board[i][j] = line;
+        	}
+        }
+    }
+ 
+    public static void main(String[] args) {
+    	Scanner sc = new Scanner(System.in);
+        int s = sc.nextInt(); // 선의 길이
+        String num = sc.next(); // 모니터에 표시할 수
+        int n = num.length(); // 표시할 숫자 개수
+        
+        // 숫자 하나당 s+3개의 열 필요(3개의 공백 - 가로선 앞뒤 공백 2개와 숫자 간 공백 1개)
+        board = new String[2 * s + 3][(s + 3) * n];
+ 
+        // 모든 칸을 공백으로 채우고 시작
+        for(int i = 0; i < board.length; i++) {
+        	Arrays.fill(board[i], " ");
+        }
+ 
+        int start = 0; // 각 숫자의 시작 열 변수
+        for (int i = 0; i < n; i++) {
+        	int number = num.charAt(i) - '0'; // 표시할 숫자
+        	
+        	// drawLine(시작 행, 끝 행, 시작 열, 끝 열, 선 모양)
+        	// 가로선 저장
+            if (arr[number][0] == 1) drawLine(0, 0, start + 1, start + s, "-");
+            if (arr[number][3] == 1) drawLine(s + 1, s + 1, start + 1, start + s, "-");
+            if (arr[number][6] == 1) drawLine((s + 1) * 2, (s + 1) * 2, start + 1, start + s, "-");
+ 
+            // 세로선 저장
+            if (arr[number][1] == 1) drawLine(1, s, start, start, "|");
+            if (arr[number][2] == 1) drawLine(1, s, start + s + 1, start + s + 1, "|");
+            if (arr[number][4] == 1) drawLine(s + 2, s * 2 + 1, start, start, "|");
+            if (arr[number][5] == 1) drawLine(s + 2, s * 2 + 1, start + s + 1, start + s + 1, "|");
+ 
+            // 다음 시작 열의 인덱스
+            // = 이전 시작 열의 인덱스 + s(가로 선) + 공백(세로 선 자리) + 공백(숫자 간 띄어쓰기) + 1
+            start += (s + 3); // 숫자를 표시할 시작 열 변수의 인덱스 증가
+        }
+ 
+        // 출력
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < board.length; i++) {
+        	for(int j = 0; j < board[i].length; j++) {
+        		sb.append(board[i][j]);
+        	}
+        	sb.append("\n");
+        }
+        System.out.println(sb);
+    }
+ 
+}
