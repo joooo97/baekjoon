@@ -1,0 +1,77 @@
+import java.util.*;
+
+public class Main {
+	public static int n, m, ans;
+	public static int[] board;
+	public static boolean[] visited; // true: 가로 조각, false: 세로 조각
+	
+	public static void calculate() {
+		int sum = 0; // 모든 조각의 합
+		
+		// 각 행마다 연속된 가로 조각의 합 구하기
+		for(int i = 0; i < n; i++) {
+			int cur = 0; // 현재까지 연속된 가로조각의 합
+			for(int j = 0; j < m; j++) {
+				if(visited[i * m + j]) // 가로조각이라면
+					cur = cur * 10 + board[i * m + j];
+				else { // 세로조각 이라면
+					sum += cur;
+					cur = 0;
+				}
+			}
+			sum += cur;
+		}
+		
+		// 각 열마다 연속된 세로 조각의 합 구하기
+		for(int j = 0; j < m; j++) {
+			int cur = 0; // 현재까지 연속된 세로조각의 합
+			for(int i = 0; i < n; i++) {
+				if(!visited[i * m + j]) // 세로조각이라면
+					cur = cur * 10 + board[i * m + j];
+				else { // 가로조각이라면
+					sum += cur;
+					cur = 0;
+				}
+			}
+			sum += cur;
+		}
+		
+		// 최댓값 갱신
+		if(ans < sum) ans = sum;
+	}
+	
+	public static void recur(int idx) {
+		if(idx == n * m) {
+			calculate();
+			return;
+		}
+		
+		// 현재 수를 가로 조각으로 선택
+		visited[idx] = true;
+		recur(idx + 1);
+		
+		// 현재 수를 세로 조각으로 선택
+		visited[idx] = false;
+		recur(idx + 1);
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		m = sc.nextInt();
+		board = new int[n * m];
+		visited = new boolean[n * m];
+		
+		for(int i = 0; i < n; i++) {
+			String line = sc.next();
+			for(int j = 0; j < m; j++) {
+				board[i * m + j] = line.charAt(j) - '0';
+			}
+		}
+		
+		// 모든 경우의 수 탐색
+		// 크기가 nm인 1차원 배열로 표현 후 탐색
+		recur(0);
+		System.out.println(ans);
+	}
+}
