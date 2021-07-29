@@ -1,0 +1,245 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n, r;
+	public static int[][] arr;
+
+	// 연산 1~4: 부분 배열 나누기(연산 번호, 부분 배열 시작 행, 부분 배열 시작 열, 부분 배열 사이즈)
+	public static void divideArr(int k, int sx, int sy, int sub_size) {
+		// 부분 배열 구하기
+		int[][] sub_arr = new int[sub_size][sub_size];
+		for(int i = 0; i < sub_size; i++) {
+			for(int j = 0; j < sub_size; j++) {
+				sub_arr[i][j] = arr[sx + i][sy + j];
+			}
+		}
+		// 부분 배열에 대해 연산 진행
+		if(k == 1) sub_arr = oper1(sub_arr);
+		else if(k == 2) sub_arr = oper2(sub_arr);
+		else if(k == 3) sub_arr = oper3(sub_arr);
+		else if(k == 4) sub_arr = oper4(sub_arr);
+
+		// 원본 배열의 값 변경
+		for(int i = 0; i < sub_size; i++) {
+			for(int j = 0; j < sub_size; j++) {
+				arr[sx + i][sy + j] = sub_arr[i][j];
+			}
+		}
+	}
+	
+	// 부분 배열 상하 반전
+	public static int[][] oper1(int[][] sub_arr) {
+		int n = sub_arr.length;
+		int[][] arr2 = new int[n][n];
+
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				arr2[i][j] = sub_arr[n-1-i][j];
+			}
+		}
+		return arr2;
+	}
+
+	// 부분 배열 좌우 반전
+	public static int[][] oper2(int[][] sub_arr) {
+		int n = sub_arr.length;
+		int[][] arr2 = new int[n][n];
+
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				arr2[i][j] = sub_arr[i][n-1-j];
+			}
+		}
+		return arr2;
+	}
+
+	// 부분 배열 오른쪽으로 90도 회전
+	public static int[][] oper3(int[][] sub_arr) {
+		int n = sub_arr.length;
+		int[][] arr2 = new int[n][n];
+
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				arr2[i][j] = sub_arr[n-1-j][i];
+			}
+		}
+		return arr2;                                                                      
+	}
+	
+	// 부분 배열 왼쪽으로 90도 회전
+	public static int[][] oper4(int[][] sub_arr) {
+		int n = sub_arr.length;
+		int[][] arr2 = new int[n][n];
+		
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				arr2[i][j] = sub_arr[j][n-1-i];
+			}
+		}
+		return arr2;                                                                      
+	}
+	
+	// 상하 반전 (각 부분 배열이 한 칸)
+	// 기존 연산: arr2[i][j] = arr[n-1-i][j]
+	// 각 부분 배열을 칸으로 생각했을 때: arr2[x1][y1] = arr[x2][y2]
+	public static void oper5(int l) {
+		int n = arr.length; // 전체 배열의 길이
+		int[][] arr2 = new int[n][n];
+		int sub_size = (int)Math.pow(2, l); // 부분 배열의 길이
+		// 각 부분배열을 한 칸으로 생각했을 때 배열의 길이
+		int sub_n = n / sub_size;
+		
+		// 1. 각 부분 배열에 대해
+		for(int i = 0; i < sub_n; i++) {
+			for(int j = 0; j < sub_n; j++) {
+				
+				// 기준 칸: 각 부분 배열의 맨 왼쪽 윗 칸
+				// (x1, y1): 이동 전 부분 배열의 맨 왼쪽 윗 칸의 위치
+				int x1 = i * sub_size;
+				int y1 = j * sub_size;
+				// (x2, y2): 이동 후 부분 배열의 맨 왼쪽 윗 칸의 위치
+				int x2 = (sub_n - 1 - i) * sub_size;
+				int y2 = j * sub_size;
+				
+				// 2. 각 부분배열의 모든 칸 이동 
+				// arr2[x1][y1] = arr[x2][y2]를 각 칸에 대해 진행
+				for(int x = 0; x < sub_size; x++) {
+					for(int y = 0; y < sub_size; y++) {
+						arr2[x1 + x][y1 + y] = arr[x2 + x][y2 + y];
+					}
+				}
+			}
+		}
+		// 값 변경
+		arr = arr2;
+	}
+
+	// 좌우 반전 (각 부분 배열이 한 칸)
+	// 기존 연산: arr2[i][j] = arr[i][n-1-j]
+	// 현재 연산: arr2[x1][y1] = arr[x2][y2]
+	public static void oper6(int l) {
+		int n = arr.length; // 전체 배열의 길이
+		int[][] arr2 = new int[n][n];
+		int sub_size = (int)Math.pow(2, l); // 부분 배열의 길이
+		int sub_n = n / sub_size; // 부분배열을 한 칸이라고 했을 때 배열의 길이
+		
+		for(int i = 0; i < sub_n; i++) {
+			for(int j = 0; j < sub_n; j++) {
+				// 기준 칸: 각 부분 배열의 맨 왼쪽 윗 칸
+				// 이동 전 위치
+				int x1 = i * sub_size;
+				int y1 = j * sub_size;
+				// 이동 후 위치
+				int x2 = i * sub_size;
+				int y2 = (sub_n - 1 - j) * sub_size;
+				
+				// 각 부분배열의 모든 칸 이동
+				for(int x = 0; x < sub_size; x++) {
+					for(int y = 0; y < sub_size; y++) {
+						arr2[x1 + x][y1 + y] = arr[x2 + x][y2 + y];
+					}
+				}
+			}
+		}
+		arr = arr2;
+	}
+
+	// 우로 90도 회전 (각 부분 배열이 한 칸)
+	// 기존 연산: arr2[i][j] = arr[n-1-j][i]
+	// 현재 연산: arr2[x1][y1] = arr[x2][y2]
+	public static void oper7(int l) {
+		int n = arr.length;
+		int[][] arr2 = new int[n][n];
+		int sub_size = (int)Math.pow(2, l);
+		int sub_n = n / sub_size;
+		
+		for(int i = 0; i < sub_n; i++) {
+			for(int j = 0; j < sub_n; j++) {
+				int x1 = i * sub_size;
+				int y1 = j * sub_size;
+				int x2 = (sub_n - 1 - j) * sub_size;
+				int y2 = i * sub_size;
+				
+				for(int x = 0; x < sub_size; x++) {
+					for(int y = 0; y < sub_size; y++) {
+						arr2[x1 + x][y1 + y] = arr[x2 + x][y2 + y];
+					}
+				}
+			}
+		}
+		arr = arr2;
+	}
+	
+	// 좌로 90도 회전
+	// 기존 연산: arr2[i][j] = arr[j][n-1-i]
+	// 현재 연산: arr2[x1][y1] = arr[x2][y2]
+	public static void oper8(int l) {
+		int n = arr.length;
+		int[][] arr2 = new int[n][n];
+		int sub_size = (int)Math.pow(2, l);
+		int sub_n = n / sub_size;
+		
+		for(int i = 0; i < sub_n; i++) {
+			for(int j = 0; j < sub_n; j++) {
+				int x1 = i * sub_size;
+				int y1 = j * sub_size;
+				int x2 = j * sub_size;
+				int y2 = (sub_n - 1 - i) * sub_size;
+				
+				for(int x = 0; x < sub_size; x++) {
+					for(int y = 0; y < sub_size; y++) {
+						arr2[x1 + x][y1 + y] = arr[x2 + x][y2 + y];
+					}
+				}
+			}
+		}
+		arr = arr2;
+	}
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		r = Integer.parseInt(st.nextToken()); // 연산 횟수
+		// 전체 배열의 길이
+		int arr_size = (int)Math.pow(2, n);
+		arr = new int[arr_size][arr_size];
+
+		for(int i = 0; i < arr_size; i++) {
+			st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < arr_size; j++) {
+				arr[i][j] = Integer.parseInt(st.nextToken());
+			}
+		}
+
+		while(r-- > 0) {
+			st = new StringTokenizer(br.readLine());
+			int k = Integer.parseInt(st.nextToken()); // 연산 번호
+			int l = Integer.parseInt(st.nextToken()); // 단계
+			int sub_size = (int)Math.pow(2, l);
+
+			// 1 ~ 4번 연산은 각 부분배열에 대해 연산 진행
+			if(1 <= k && k <= 4) {
+				for(int i = 0; i < arr_size; i += sub_size) {
+					for(int j = 0; j < arr_size; j += sub_size) {
+						divideArr(k, i, j, sub_size); // 부분 배열 나누기
+					}
+				}
+			}
+			else if(k == 5) oper5(l);
+			else if(k == 6) oper6(l);
+			else if(k == 7) oper7(l);
+			else if(k == 8) oper8(l);
+		}
+
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < arr_size; i++) {
+			for(int j = 0; j < arr_size; j++) {
+				sb.append(arr[i][j]).append(" ");
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb);
+	}
+}
