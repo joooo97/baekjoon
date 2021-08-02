@@ -1,0 +1,85 @@
+import java.util.*;
+import java.io.*;
+
+// 0번: 올리는 위치, n-1번: 내리는 위치
+// 로봇이 내리는 위치에 도달하는 즉시 내리기
+// 내구도 1 감소: 로봇 올릴 때, 로봇 이동
+
+public class Main {
+	public static int n, k, cnt;
+	public static int[] a;
+	public static boolean[] robot;
+
+	// 벨트 한 칸 회전 (로봇 위치 변경 시 내구도 감소 x)
+	public static void rotateBelt() {
+		// 벨트 회전
+		int tmp = a[2 * n - 1];
+		for(int i = 2 * n - 1; i > 0; i--)
+			a[i] = a[i-1];
+		a[0] = tmp;
+
+		// 로봇 위치 변경
+		for(int i = n-1; i > 0; i--)
+			robot[i] = robot[i-1];
+		robot[0] = false;
+		// 로봇이 내리는 위치에 있다면 내리기
+		if(robot[n-1]) robot[n-1] = false;
+	}
+
+	// 로봇 한 칸씩 이동
+	public static void moveRobot() {
+		for(int i = n-2; i >= 0; i--) {
+			if(robot[i]) { // 현재 칸에 로봇이 있다면
+				// 다음 칸에 로봇 존재 x, 내구도 > 0이라면
+				if(!robot[i+1] && a[i+1] > 0) {
+					// 로봇 이동
+					robot[i+1] = true;
+					robot[i] = false;
+					// 내구도 감소
+					a[i+1] -= 1;
+					if(a[i+1] == 0) cnt += 1;
+				}
+			}
+
+		}
+		// 로봇이 내리는 위치에 있다면 내리기
+		if(robot[n-1]) robot[n-1] = false;
+	}
+
+	// 로봇 올리기
+	public static void putRobot() {
+		if(a[0] > 0) {
+			robot[0] = true;
+			a[0] -= 1; // 내구도 감소
+			if(a[0] == 0) cnt++;
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		k = Integer.parseInt(st.nextToken());
+		a = new int[2 * n]; // 각 칸의 내구도
+		robot = new boolean[n]; // 로봇 존재 여부
+
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < 2 * n; i++) {
+			a[i] = Integer.parseInt(st.nextToken());
+		}
+
+		int stage = 0;
+		while(true) {	
+			stage++; 
+			rotateBelt(); // 1. 벨트 한 칸 회전
+			moveRobot(); // 2. 로봇 이동
+			putRobot(); // 3. 로봇 올리기
+
+			if(cnt >= k) {
+				System.out.println(stage);
+				break;
+			}
+		}
+
+	}
+}
