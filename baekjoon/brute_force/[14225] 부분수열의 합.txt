@@ -1,0 +1,42 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n;
+	public static int[] s;
+	// 주어지는 수의 최대값은 100000이고 최대 n개가 주어지므로
+	// 부분수열의 합의 최대값은 2000000
+	public static boolean[] sumArr = new boolean[2000001];
+	
+	public static void recur(int idx, int sum) {
+		if(idx == n) {
+			sumArr[sum] = true;
+			return;
+		}
+		
+		// idx번째 수를 부분수열에 추가
+		recur(idx + 1, sum + s[idx]);
+		// idx번째 수를 부분수열에 추가x
+		recur(idx + 1, sum);
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
+		s = new int[n];
+		
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			s[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		recur(0, 0);
+		// for (int i=1;; i++) {
+		for(int i = 1; i <= 2000000; i++) {
+			if(!sumArr[i]) {
+				System.out.println(i);
+				break;
+			}
+		}
+	}
+}
