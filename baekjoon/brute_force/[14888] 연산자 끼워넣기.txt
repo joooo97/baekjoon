@@ -1,0 +1,65 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n, add, sub, mul, div;
+	public static int max = Integer.MIN_VALUE;
+	public static int min = Integer.MAX_VALUE;
+	public static int[] a;
+	
+	// idx: 계산해야 할 수의 인덱스
+	// cur: 현재까지의 계산 결과
+	public static void recur(int idx, int cur) {
+		// 모든 수에 대해 연산이 끝나면 최댓값, 최소값 갱신
+		if(idx == n) {
+			max = Math.max(max, cur);
+			min = Math.min(min, cur);
+			return;
+		}
+		
+		// 각 연산자에 대하여 재귀적 수행
+		if(add > 0) {
+			add -= 1;
+			recur(idx + 1, cur + a[idx]);
+			add += 1;
+		}
+		if(sub > 0) {
+			sub -= 1;
+			recur(idx + 1, cur - a[idx]);
+			sub += 1;
+		}
+		if(mul > 0) {
+			mul -= 1;
+			recur(idx + 1, cur * a[idx]);
+			mul += 1;
+		}
+		if(div > 0) {
+			div -= 1;
+			recur(idx + 1, cur / a[idx]);
+			div +=1 ;
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
+		a = new int[n];
+		
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			a[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		st = new StringTokenizer(br.readLine());
+		add = Integer.parseInt(st.nextToken());
+		sub = Integer.parseInt(st.nextToken());
+		mul = Integer.parseInt(st.nextToken());
+		div = Integer.parseInt(st.nextToken());
+		
+		// 현재 계산 결과는 첫 번째 수인 a[0]이고, 
+		// 두 번째 수부터 연산자와 함께 연산해야 하므로 연산할 수의 idx는 1로 시작
+		recur(1, a[0]);
+		System.out.println(max);
+		System.out.println(min);
+	}
+}
