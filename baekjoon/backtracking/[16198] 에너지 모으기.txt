@@ -1,0 +1,37 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+	public static int n, ans;
+	public static ArrayList<Integer> w = new ArrayList<>();
+
+	public static void recur(int cur) {
+		// 첫 번째와 마지막 구슬은 고를 수 없으므로 구슬이 2개가 된 경우 재귀 호출 종료
+		if(w.size() == 2) {
+			if(ans < cur) ans = cur;
+			return;
+		}
+		
+		for(int i = 1; i < w.size()-1; i++) {
+			int tmp = w.get(i); // 제거될 구슬의 무게
+			int sum = w.get(i-1) * w.get(i+1); // 모을 에너지
+			w.remove(i); // x번째 구슬 제거
+			recur(cur + sum);
+			
+			// 구슬 복원
+			w.add(i, tmp);
+		}
+	}
+	
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		
+		for(int i = 0; i < n; i++) {
+			w.add(sc.nextInt());
+		}
+		
+		recur(0);
+		System.out.println(ans);
+	}
+}
