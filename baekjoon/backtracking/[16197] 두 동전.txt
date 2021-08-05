@@ -1,0 +1,88 @@
+import java.util.*;
+import java.io.*;
+
+
+public class Main {
+	public static int n, m;
+	public static int ans = Integer.MAX_VALUE;
+	public static char[][] board;
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+
+	public static void recur(int cnt_push, int x1, int y1, int x2, int y2) {
+		// 이미 버튼을 10번 누른 경우 불가능한 경우이므로 더이상 이동하지 않음
+		if(cnt_push == 10) return;
+
+		for(int i = 0; i < 4; i++) {
+			int nx1 = x1 + dx[i];
+			int ny1 = y1 + dy[i];
+			int nx2 = x2 + dx[i];
+			int ny2 = y2 + dy[i];
+
+			// 다음 이동 칸의 범위 체크(동전이 떨어지는지 확인)
+			int cnt_fall = 0;
+			if(nx1 < 0 || nx1 >= n || ny1 < 0  || ny1 >= m)
+				cnt_fall++;
+			if(nx2 < 0 || nx2 >= n || ny2 < 0  || ny2 >= m)
+				cnt_fall++;
+
+			// 이동 시 두 동전이 떨어지는 경우, 다음 코드 무시하고 다른 이동 방향 확인
+			if(cnt_fall == 2) continue;
+			// 이동 시 한 동전만 떨어지는 경우, 누르는 버튼의 최소 횟수 갱신 
+			if(cnt_fall == 1) {
+				ans = Math.min(ans, cnt_push + 1);
+				return;
+			}
+
+			// 이동 시 아무 동전도 떨어지지 않는 경우
+			// - 다음 이동 칸이 벽인 경우, 다음 이동 위치를 현재 위치로 지정(이동 불가)
+			if(board[nx1][ny1] == '#') {
+				nx1 = x1;
+				ny1 = y1;
+			}
+			if(board[nx2][ny2] == '#') {
+				nx2 = x2;
+				ny2 = y2;
+			}
+			
+			// 다음 칸으로 이동
+			recur(cnt_push + 1, nx1, ny1, nx2, ny2);
+		}
+
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		board = new char[n][m];
+
+		int x1, y1, x2, y2; // 두 동전의 위치
+		x1 = y1 = x2 = y2 = -1;
+
+		for(int i = 0; i < n; i++) {
+			String line = br.readLine();
+			for(int j = 0; j < m; j++) {
+				board[i][j] = line.charAt(j);
+				// 동전 위치 기록
+				if(board[i][j] == 'o') {
+					if(x1 == -1) { // 처음 동전이라면
+						x1 = i;
+						y1 = j;
+					} else { // 두 번째 동전이라면
+						x2 = i;
+						y2 = j;
+					}
+				}
+			}
+		}
+
+		recur(0, x1, y1, x2, y2);
+		
+		if(ans == Integer.MAX_VALUE) System.out.println(-1);
+		else System.out.println(ans);
+
+	}
+}
