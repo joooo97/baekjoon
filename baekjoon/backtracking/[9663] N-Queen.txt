@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class Main {
+	public static int n, cnt;
+	public static int[] board;
+
+	public static boolean check(int row) {
+		// row의 이전 행들의 퀸 위치와 비교
+		for(int i = 0; i < row; i++) {
+			// 같은 열에 놓인 퀸이 있는지 확인
+			if(board[row] == board[i]) 
+				return false;
+			
+			// 같은 대각선상에 놓인 퀸이 있는지 확인
+			// 두 퀸의 행의 차이와 열의 차이가 같다면 같은 대각선상에 위치한 것
+			if(Math.abs(row - i) == Math.abs(board[row] - board[i]))
+				return false;
+		}
+		return true;
+	}
+	
+	public static void putQueen(int row) {
+		// 모든 행에 퀸을 놓은 경우
+		if(row == n) {
+			cnt++;
+			return;
+		}
+		
+		// 현재 행에 퀸 놓기
+		for(int i = 0; i < n; i++) {
+			// i열에 퀸 놓아보기
+			board[row] = i;
+			// 현재 행에 놓을 수 있다면 다음 행에 퀸을 놓으러 가기
+			if(check(row)) putQueen(row + 1);
+		}
+	}
+	
+	public static void main(String args[]) {
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
+		board = new int[n];
+		
+		putQueen(0); // 체스판의 0행부터 퀸을 놓는다.
+		System.out.println(cnt);
+	}
+}
