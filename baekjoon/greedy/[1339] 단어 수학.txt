@@ -1,0 +1,44 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n, ans;
+	public static String[] words;
+	// 각 알파벳에 저장할 값
+	public static int[] alpha_value = new int[26];
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+		n = Integer.parseInt(br.readLine());
+		words = new String[n];
+		
+		for(int i = 0; i < n; i++) {
+			words[i] = br.readLine();
+		}
+		
+		// 각 알파벳의 자리수에 따른 10의 배수 저장
+		// GCF라면 G=100, C=10, F=1 저장
+		for(int i = 0; i < n; i++) {
+			int tmp = (int)Math.pow(10, words[i].length()-1);
+			for(int j = 0; j < words[i].length(); j++) {
+				alpha_value[words[i].charAt(j) - 'A'] += tmp;
+				tmp /= 10;
+			}
+		}
+		
+		// 오름차순 정렬
+		// 존재하지 않는 알파벳들의 값은 0
+		Arrays.sort(alpha_value);
+		
+		// 자리수가 높은 순으로 알파벳에 9부터 넣어주기
+		for(int i = 25, j = 9; i >= 0; i--, j--) {
+			// 알파벳 값이 존재할 때까지만 값 넣어주기
+			if(alpha_value[i] == 0) break;
+			
+			ans += (alpha_value[i] * j);
+		}
+		
+		System.out.println(ans);
+	}
+}
