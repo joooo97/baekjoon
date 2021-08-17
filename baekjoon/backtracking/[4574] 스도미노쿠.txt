@@ -1,0 +1,146 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static StringBuilder sb = new StringBuilder();
+	public static int[][] board; // 스도쿠 배열
+	// 1~9까지의 서로 다른 숫자의 쌍으로 이루어진 도미노의 사용 여부 저장 배열
+	public static boolean[][] domino;
+
+	// 도미노를 놓을 위치를 찾기 위해 오른쪽, 아래 방향 체크
+	public static int[] dx = {0, 1};
+	public static int[] dy = {1, 0};
+
+	// 현재 칸에 숫자를 놓을 수 있는지 확인
+	public static boolean check(int row, int col, int value) {
+		// 현재 칸과 같은 행에 숫자가 있는지 확인
+		for(int i = 0; i < 9; i++) {
+			if(board[row][i] == value) return false;
+		}
+
+		// 현재 칸과 같은 열에 숫자가 있는지 확인
+		for(int i = 0; i < 9; i++) {
+			if(board[i][col] == value) return false;
+		}
+
+		// 현재 칸이 속해 있는 3x3 영역 확인
+		int first_row = (row / 3) * 3;
+		int first_col = (col / 3) * 3;
+
+		for(int i = first_row; i < first_row + 3; i++) {
+			for(int j = first_col; j < first_col + 3; j++) {
+				if(board[i][j] == value) return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static boolean fill(int idx) {
+		if(idx == 81) return true;
+
+		// 현재 칸의 행, 열 인덱스
+		// (x, y) 칸은 (x * 9 + y)번째 칸
+		int x = idx / 9;
+		int y = idx % 9;
+
+		if(board[x][y] == 0) {
+			// 도미노를 놓을 방향(우, 하) 정하기
+			for(int k = 0; k < 2; k++) {
+				int nx = x + dx[k];
+				int ny = y + dy[k];
+
+				// 스도쿠 범위를 벗어나거나 이미 숫자를 놓은 경우라면 무시
+				if(nx < 0 || nx >= 9 || ny < 0 || ny >= 9 || board[nx][ny] != 0) continue;
+
+				// 사용 가능한 서로 다른 숫자 쌍의 도미노 만들어보기
+				for(int i = 1; i <= 9; i++) {
+					for(int j = 1; j <= 9; j++) {
+						// 서로 다른 숫자 쌍이 아니거나 이미 사용된 도미노라면 무시
+						if(i == j || domino[i][j]) continue;
+
+						// 두 개의 칸에 도미노를 놓을 수 있다면
+						if(check(x, y, i) && check(nx, ny, j)) {
+							// 도미노 놓기
+							board[x][y] = i;
+							board[nx][ny] = j;
+							// 도미노 사용 여부 저장
+							domino[i][j] = true;
+							domino[j][i] = true;
+
+							// 다음 칸으로 이동
+							if(fill(idx + 1)) return true;
+
+							// 정답을 찾지 못했다면 다른 도미노를 만들어 탐색해야 함
+							board[x][y] = 0;
+							board[nx][ny] = 0;
+							domino[i][j] = false;
+							domino[j][i] = false;
+						}
+					}
+				}
+			}
+
+		} else {
+			return fill(idx + 1);
+		}
+
+		// 정답을 찾지 못했다면 false 반환
+		return false;
+	}
+
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st;
+
+		int tc = 1; // 테스트 케이스 인덱스
+		while(true) {
+			int n = Integer.parseInt(br.readLine());
+			if(n == 0) break;
+
+			// 스도쿠 배열, 도미노 배열 초기화
+			board = new int[9][9];
+			domino = new boolean[10][10];
+
+			// 주어진 도미노 값과 도미노 사용 여부 저장
+			while(n-- > 0) {
+				st = new StringTokenizer(br.readLine());
+
+				// 스도쿠에 도미노의 첫번째 값 저장
+				int u = Integer.parseInt(st.nextToken());
+				String loc1 = st.nextToken();
+				board[loc1.charAt(0) - 'A'][loc1.charAt(1) - '1'] = u;
+
+				// 스도쿠에 도미노의 두번째 값 저장
+				int v = Integer.parseInt(st.nextToken());
+				String loc2 = st.nextToken();
+				board[loc2.charAt(0) - 'A'][loc2.charAt(1) - '1'] = v;
+
+				// u, v로 이루어진 도미노 사용 여부를 true로 처리
+				domino[u][v] = domino[v][u] = true;
+			}
+
+			// 주어진 스도쿠의 위치에 1~9 숫자 저장
+			st = new StringTokenizer(br.readLine());
+			for(int i = 1; i <= 9; i++) {
+				String loc = st.nextToken();
+				board[loc.charAt(0) - 'A'][loc.charAt(1) - '1'] = i;
+			}
+
+			// 스도미노쿠 답 구하기
+			fill(0);
+			
+			sb.append("Puzzle ").append(tc).append("\n");
+			
+			for(int i = 0; i < 9; i++) {
+				for(int j = 0; j < 9; j++) {
+					sb.append(board[i][j]);
+				}
+				sb.append("\n");
+			}
+
+			tc += 1;
+		} // while문
+		System.out.println(sb);
+	}
+}
