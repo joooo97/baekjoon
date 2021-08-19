@@ -1,0 +1,82 @@
+import java.util.*;
+import java.io.*;
+
+// 배열 A의 부 배열의 합 + 배열 B의 부 배열의 합 = T가 되는 모든 부 배열 쌍의 개수
+public class Main {
+	public static int t, n, m;
+	public static int[] arrA, arrB;
+	public static ArrayList<Integer> sumA = new ArrayList<>();
+	public static ArrayList<Integer> sumB = new ArrayList<>();
+	
+	// 경우의 수 구하기
+	public static long getCnt() {
+		long cnt = 0;
+		int lp = 0; // leftPointer
+		int rp = sumB.size() - 1; // rightPointer
+		
+		while(lp < sumA.size() && rp >= 0) {
+			int lv = sumA.get(lp); // leftValue
+			int rv = sumB.get(rp); // rightValue
+			
+			if(lv + rv == t) {
+				long lc = 0; // leftCnt
+				while(lp < sumA.size() && sumA.get(lp) == lv) {
+					lc++;
+					lp++;
+				}
+				
+				long rc = 0; // rightCnt
+				while(rp >= 0 && sumB.get(rp) == rv) {
+					rc++;
+					rp--;
+				}
+				
+				cnt += (lc * rc);
+			} else if(lv + rv < t) {
+				lp++;
+			} else {
+				rp--;
+			}
+		}
+		return cnt;
+	}
+	
+	// 부 배열의 합 구하기
+	public static void subSum(int[] arr, ArrayList<Integer> list) {
+		for(int i = 0; i < arr.length; i++) {
+			int sum = 0;
+			for(int j = i; j < arr.length; j++) {
+				sum += arr[j];
+				list.add(sum);
+			}
+		}
+	}
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		t = Integer.parseInt(br.readLine());
+		n = Integer.parseInt(br.readLine());
+		arrA = new int[n];
+		
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			arrA[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		m = Integer.parseInt(br.readLine());
+		arrB = new int[m];
+		
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < m; i++) {
+			arrB[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		subSum(arrA, sumA); // 배열 A의 부 배열의 합
+		subSum(arrB, sumB); // 배열 B의 부 배열의 합
+		
+		Collections.sort(sumA);
+		Collections.sort(sumB);
+		
+		System.out.println(getCnt());
+	}
+}
