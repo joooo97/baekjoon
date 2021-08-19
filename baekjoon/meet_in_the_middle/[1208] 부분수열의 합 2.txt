@@ -1,0 +1,88 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n, s;
+	public static int[] arr;
+	public static ArrayList<Integer> first = new ArrayList<>();
+	public static ArrayList<Integer> second = new ArrayList<>();
+	
+	// 합이 s가 되는 부분수열의 개수
+	public static long getCnt() {
+		long cnt = 0;
+		int lp = 0; // left pointer
+		int rp = second.size() - 1; // right pointer
+		
+		while(lp < first.size() && rp >= 0) {
+			int lv = first.get(lp); // lp가 가리키는 값
+			int rv = second.get(rp); // rp가 가리키는 값
+			
+			if(lv + rv == s) {
+				// left포인터가 가리키는 first리스트의 값과 동일한 값의 개수
+				long lc = 0; // lv와 동일한 값의 개수
+				while(lp < first.size() && first.get(lp) == lv) {
+					lc++;
+					lp++;
+				}
+				
+				// right포인터가 가리키는 second리스트의 값과 동일한 값의 개수
+				long rc = 0; // rv와 동일한 값의 개수
+				while(rp >= 0 && second.get(rp) == rv) {
+					rc++;
+					rp--;
+				}
+				
+				// 부분수열의 합의 개수 카운트
+				cnt += (lc * rc);
+				
+			} else if(lv + rv < s) {
+				lp++;
+			} else { // lv + rv > s
+				rp--;
+			}
+		}
+		
+		return cnt;
+	}
+	
+	// 두 그룹으로 나누어진 각 수열의 모든 부분수열의 합 구하기
+	public static void subSum(int idx, int n, int sum, ArrayList<Integer> list) {
+		// 부분수열의 합의 모든 경우의 수를 리스트에 담아줌
+		if(idx == n) {
+			list.add(sum);
+			return;
+		}
+		
+		subSum(idx+1, n, sum+arr[idx], list); // idx번째 수 선택
+		subSum(idx+1, n, sum, list); // idx번째 수 선택x
+	}
+
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		s = Integer.parseInt(st.nextToken());
+		arr = new int[n];
+		
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			arr[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		// 1. 수열을 두 그룹으로 나누어 모든 부분수열의 합을 구함
+		subSum(0, n/2, 0, first);
+		subSum(n/2, n, 0, second);
+		
+		// 오름차순 정렬
+		Collections.sort(first);
+		Collections.sort(second);
+
+		// 2. 합이 s가 되는 부분수열의 개수 구하기
+		long ans = getCnt();		
+		
+		// 3. s = 0인 경우, 공집합의 경우 빼주기
+		if(s == 0) ans -= 1;
+		
+		System.out.println(ans);
+	}
+}
