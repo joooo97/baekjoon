@@ -1,0 +1,88 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n;
+	public static ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
+	public static int[] order;
+	public static boolean[] visited;
+	public static Queue<Integer> q = new LinkedList<>();
+	
+	public static boolean solve() {
+		// 시작 정점 방문 처리
+		visited[1] = true;
+		q.offer(1);
+		
+		HashSet<Integer> set = new HashSet<>();
+		int idx = 1; // 두 번째 순서부터 확인
+		
+		while(!q.isEmpty()) {
+			int now = q.poll();
+			
+			set.clear();
+
+			// 현재 꺼낸 노드의 방문하지 않은 인접노드들을 set에 모두 담기
+			for(int next : graph.get(now)) {
+				if(!visited[next]) {
+					set.add(next);
+					visited[next] = true;
+				}
+			}
+			
+			// 꺼낸 노드의 인접 노드 수만큼 올바른 순서인지 확인
+			// now 다음으로 올 수 있는 수는 now의 인접 노드만 가능하기 때문
+			for(int i = idx; i < idx + set.size(); i++) {
+				int node = order[i]; // 확인할 순서의 노드
+				
+				if(set.contains(node)) {
+					q.offer(node); // 방문
+				} 
+				// 인접노드가 아닌 다른 노드가 왔다는 것은 올바른 순서가 아니라는 것
+				else return false;
+			}
+
+			idx += set.size();
+		}
+		
+		return true;
+	}
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
+		
+		n = Integer.parseInt(br.readLine());
+		order = new int[n];
+		visited = new boolean[n+1];
+		
+		for(int i = 0; i <= n; i++) {
+			graph.add(new ArrayList<>());
+		}
+		
+		// 간선 정보 입력
+		for(int i = 0; i < n-1; i++) {
+			st = new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			
+			graph.get(a).add(b);
+			graph.get(b).add(a);
+		}
+		
+		// 주어진 BFS 방문 순서
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			order[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		if(order[0] != 1) {
+			System.out.println(0);
+			System.exit(0);
+		}
+		
+		if(solve())
+			System.out.println(1);
+		else
+			System.out.println(0);
+	}
+}
