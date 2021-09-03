@@ -1,0 +1,87 @@
+import java.io.*;
+
+public class Main {
+	public static int n;
+	public static char[][] map;
+	public static boolean[][] visited;
+	
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+	
+	// 적록색약이 아닌 사람이 봤을 때
+	public static void dfs_rgb(int x, int y, char color) {
+		visited[x][y] = true;
+		
+		for(int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			
+			if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+			
+			if(map[nx][ny] == color && !visited[nx][ny]) 
+				dfs_rgb(nx, ny, color);
+		}
+	}
+	
+	// 적록색약인 사람이 봤을 때
+	public static void dfs_rrb(int x, int y, char color) {
+		visited[x][y] = true;
+		
+		for(int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			
+			if(nx < 0 || nx >= n || ny < 0 || ny >= n || visited[nx][ny]) continue;
+			
+			if(color == 'R' || color == 'G') {
+				if(map[nx][ny] == 'R' || map[nx][ny] == 'G')
+					dfs_rrb(nx, ny, map[nx][ny]);
+			} else {
+				if(map[nx][ny] == color)
+					dfs_rrb(nx, ny, color);
+			}
+		}
+	}
+
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
+		map = new char[n][n];
+		
+		for(int i = 0; i < n; i++) {
+			String line = br.readLine();
+			for(int j = 0; j < n; j++) {
+				map[i][j] = line.charAt(j);
+			}
+		}
+		
+		visited = new boolean[n][n];
+		int cnt_rgb = 0;
+		
+		// 적록색약이 아닌 사람이 봤을 때
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(!visited[i][j]) {
+					dfs_rgb(i, j, map[i][j]);
+					cnt_rgb += 1;
+				}
+			}
+		}
+		
+		visited = new boolean[n][n];
+		int cnt_rrb = 0;
+		
+		// 적록색약인 사람이 봤을 때
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(!visited[i][j]) {
+					dfs_rrb(i, j, map[i][j]);
+					cnt_rrb += 1;
+				}
+			}
+		}
+		
+		System.out.println(cnt_rgb + " " + cnt_rrb);
+		
+	}
+}
