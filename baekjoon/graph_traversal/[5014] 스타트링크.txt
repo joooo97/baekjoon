@@ -1,0 +1,51 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int f, s, g, u, d;
+	public static int[] dist;
+	
+	public static void bfs() {
+		Queue<Integer> q = new LinkedList<>();
+		q.offer(s);
+		dist[s] = 0;
+		
+		while(!q.isEmpty()) {
+			int x = q.poll();
+			
+			if(x == g) {
+				System.out.println(dist[x]);
+				System.exit(0);
+			}
+
+			// U를 누르는 경우
+			int nx = x + u;
+			if(nx <= f && dist[nx] == -1) {
+				q.offer(nx);
+				dist[nx] = dist[x] + 1;
+			}
+			
+			// D를 누르는 경우
+			nx = x - d;
+			if(nx > 0 && dist[nx] == -1) {
+				q.offer(nx);
+				dist[nx] = dist[x] + 1;
+			}
+		}
+	}
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		f = Integer.parseInt(st.nextToken());
+		s = Integer.parseInt(st.nextToken());
+		g = Integer.parseInt(st.nextToken());
+		u = Integer.parseInt(st.nextToken());
+		d = Integer.parseInt(st.nextToken());
+		dist = new int[f + 1];
+		Arrays.fill(dist, -1);
+		
+		bfs();
+		System.out.println("use the stairs");
+	}
+}
