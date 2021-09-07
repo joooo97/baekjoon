@@ -1,0 +1,152 @@
+import java.util.*;
+import java.io.*;
+
+// 더러운 칸 -> 깨끗한 칸 변경
+// 가구: 이동 x
+// 방문할 수 없는 더러운 칸이 존재하는 경우 -1 출력
+public class Main {
+	public static int n, m, ans;
+	public static char[][] map;
+	public static int[][] dist; // 시작 칸, 더러운 칸 끼리의 거리
+	public static ArrayList<Node> list; // 시작 칸 + 더러운 칸 리스트	
+	public static boolean[] check; // 더러운 칸 선택 여부 확인 배열
+	
+	public static final int[] dx = {-1, 1, 0, 0};
+	public static final int[] dy = {0, 0, -1, 1};
+	
+	public static int[][] bfs(int sx, int sy) {
+		// 시작점에서 각 칸에 대한 거리 배열
+		int[][] d = new int[n][m];
+		for(int i = 0; i < n; i++) {
+			Arrays.fill(d[i], -1);
+		}
+		
+		Queue<Node> q = new LinkedList<>();
+		q.offer(new Node(sx, sy));
+		d[sx][sy] = 0;
+		
+		while(!q.isEmpty()) {
+			Node now = q.poll();
+			int x = now.x;
+			int y = now.y;
+			
+			for(int i = 0; i < 4; i++) {
+				int nx = x + dx[i];
+				int ny = y + dy[i];
+				
+				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+				
+				// 다음 칸이 가구이거나 방문한 칸이면 무시
+				if(map[nx][ny] == 'x' || d[nx][ny] != -1) continue;
+				
+				q.offer(new Node(nx, ny));
+				d[nx][ny] = d[x][y] + 1;
+			}
+		}
+		return d;
+	}
+	
+	// 더러운 칸의 방문 순서 정하기
+	// cnt개의 칸 중에 idx번째 순서 정하기
+	// prev: 이전 칸의 번호, cur: 현재까지 거리의 합
+	public static void getOrder(int idx, int cnt, int prev, int cur) {
+		// cnt개의 더러운 칸의 순서를 정했다면 최단 거리 비교
+		if(idx == cnt) {
+			if(ans > cur) ans = cur;
+			return;
+		}
+	
+		// 0번 칸은 시작 칸이므로 1번 ~ cnt번 칸의 순서 정하기
+		for(int i = 1; i <= cnt; i++) {
+			if(check[i]) continue;
+			
+			check[i] = true;
+			getOrder(idx + 1, cnt, i, cur + dist[prev][i]);
+			check[i] = false;
+		}
+	}
+	
+	public static void main(String args[]) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = null;
+		
+		while(true) {
+			st = new StringTokenizer(br.readLine());
+			m = Integer.parseInt(st.nextToken());
+			n = Integer.parseInt(st.nextToken());
+			
+			if(n == 0 && m == 0) break;
+			
+			map = new char[n][m];
+			list = new ArrayList<Node>();
+			list.add(new Node(0, 0));
+			
+			int sx = 0, sy = 0; // 시작 칸 좌표를 저장할 변수
+			
+			for(int i = 0; i < n; i++) {
+				String line = br.readLine();
+				for(int j = 0; j < m; j++) {
+					map[i][j] = line.charAt(j);
+					 if(map[i][j] == 'o') {
+						sx = i;
+						sy = j;
+					}
+				
+					if(map[i][j] == '*')
+						list.add(new Node(i, j));
+				}
+			}
+
+			// 시작 칸 좌표 저장
+			list.get(0).x = sx;
+			list.get(0).y = sy;
+
+			// 1. 시작 칸, 더러운 칸끼리의 거리 구하기
+			dist = new int[list.size()][list.size()];
+			boolean ok = true;
+			
+			for(int i = 0; i < list.size(); i++) {
+				Node n1 = list.get(i);
+				// 1-1. 시작 칸과 각 더러운 칸을 시작점으로 지정하여 bfs 진행
+				// 시작점에서 모든 칸까지의 최단 거리
+				int[][] d = bfs(n1.x, n1.y);
+				
+				// 1-2. 시작 칸, 더러운 칸끼리의 거리 구하기
+				for(int j = 0; j < list.size(); j++) {
+					Node n2 = list.get(j);
+					dist[i][j] = d[n2.x][n2.y];
+					
+					// 방문할 수 없는 더러운 칸인 경우
+					if(dist[i][j] == -1) ok = false;
+				}
+			}
+			
+			// 방문할 수 없는 더러운 칸이 존재하는 경우 -1 출력
+			if(!ok) {
+				System.out.println(-1);
+				continue;
+			}
+			
+			// 2. 더러운 칸의 방문 순서 정하기
+			int cnt = list.size()-1; // 더러운 칸의 개수
+			check = new boolean[cnt + 1]; // 더러운 칸 선택 여부 확인 배열
+			// 더러운 칸을 모두 깨끗한 칸으로 바꾸는 이동 횟수의 최소값
+			ans = Integer.MAX_VALUE;
+			
+			// 0번 칸은 시작 칸이므로 1번 ~ cnt번 칸의 순서 정하기
+			getOrder(0, cnt, 0, 0);
+			System.out.println(ans);
+		}
+
+	}
+}
+
+class Node {
+	int x;
+	int y;
+	
+	Node(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
