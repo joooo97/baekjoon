@@ -1,0 +1,79 @@
+import java.util.*;
+
+public class Main {
+	public static long s, t, limit = 1000000000L;
+	
+	// 크기가 10억인 배열대신 Set을 사용하여 방문 여부를 체크
+	public static HashSet<Long> visited = new HashSet<>();
+	
+	public static void bfs() {
+		Queue<Node> q = new LinkedList<>();
+		q.offer(new Node(s, ""));
+		visited.add(s);
+		
+		while(!q.isEmpty()) {
+			Node now = q.poll();
+			long num = now.num;
+			String oper = now.oper; // 연산 순서
+			
+			if(num == t) {
+				System.out.println(oper);
+				System.exit(0);
+			}
+			
+			// 사전 순으로 앞서는 연산 순서의 출력 위해 * + - / 순으로 탐색 진행
+			// * 연산
+			long next = num * num;
+			if(next <= limit && !visited.contains(next)) {
+				q.offer(new Node(next, oper + "*"));
+				visited.add(next);
+			}
+			
+			// + 연산
+			next = num + num;
+			if(next <= limit && !visited.contains(next)) {
+				q.offer(new Node(next, oper + "+"));
+				visited.add(next);
+			}
+			
+			// - 연산
+			next = num - num;
+			if(!visited.contains(next)) {
+				q.offer(new Node(next, oper + "-"));
+				visited.add(next);
+			}
+			
+			// /연산
+			if(num == 0) continue;
+			next = num / num;
+			if(!visited.contains(next)) {
+				q.offer(new Node(next, oper + "/"));
+				visited.add(next);
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		s = sc.nextInt();
+		t = sc.nextInt();
+
+		if(s == t)
+			System.out.println(0);
+		else {
+			bfs();
+			System.out.println(-1);
+		}
+		
+	}
+}
+
+class Node {
+	long num;
+	String oper;
+	
+	Node(long num, String oper) {
+		this.num = num;
+		this.oper = oper;
+	}
+}
