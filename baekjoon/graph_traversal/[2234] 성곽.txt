@@ -1,0 +1,125 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+	public static int n, m, max_size;
+	public static int[][] map;
+	public static int[][] room_idx; // 각 칸의 방 번호
+	public static int[] room_size; // 각 방의 넓이
+	
+	// 방향 배열
+	// 1) 벽이 존재하는 방향에 따라 칸의 값에 더해지는 수가 달라짐
+	//    서쪽: +1(2^0), 북쪽: +2(2^1), 동쪽: +4(2^2), 남쪽: +8(2^3)
+	// 2) 비트마스크를 이용하여 칸마다 어느 방향(k)에 벽이 존재하는지 알 수 있음
+	//    비트마스크의 검사 연산 이용 (칸의 값 & (1<<k))
+	// (1) k방향에 벽이 존재하는 경우 => 칸의 값 & (1<<k) > 0인 경우
+	//  - 칸의 값에 2^k가 더해졌으므로 k방향에 벽이 존재한다는 뜻
+	// (2) k방향에 벽이 존재하지 않는 경우 => 칸의 값 & (1<<k) == 0인 경우
+	//  - 칸의 값에 2^k가 더해지지 않았으므로 k방향에 벽이 존재하지 않는다는 뜻
+	// 비트를 이용하기 위해 방향 배열을 서, 북, 동, 남의 순서로 저장
+	public static int[] dx = {0, -1, 0, 1};
+	public static int[] dy = {-1, 0, 1, 0};
+
+	public static int bfs(int sx, int sy, int idx) {
+		Queue<Node> q = new LinkedList<>();
+		q.offer(new Node(sx, sy));
+		room_idx[sx][sy] = idx; // 방 번호 부여
+		
+		int size = 0; // 현재 방의 넓이
+		while(!q.isEmpty()) {
+			Node now = q.poll();
+			int x = now.x;
+			int y = now.y;
+			// 큐에서 꺼내질 때마다 방문한 칸의 개수(방의 넓이) 증가
+			size += 1;
+			
+			for(int i = 0; i < 4; i++) {
+				int nx = x + dx[i];
+				int ny = y + dy[i];
+				
+				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+				
+				// 현재 칸의 다음 이동 방향에 벽이 있다면 무시
+				if((map[x][y] & (1<<i)) > 0) continue;
+				
+				// 다음 칸이 아직 방 번호가 부여되지 않은 칸이라면(방문하지 않았다면)
+				if(room_idx[nx][ny] == -1) {
+					q.offer(new Node(nx, ny));
+					room_idx[nx][ny] = idx;
+				}
+			}
+		}
+		return size;
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		m = Integer.parseInt(st.nextToken());
+		n = Integer.parseInt(st.nextToken());
+		map = new int[n][m];
+		room_idx = new int[n][m];
+		room_size = new int[n * m];
+
+		for(int i = 0; i < n; i++) {
+			st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < m; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
+				room_idx[i][j] = -1; // 방문 여부 확인 및 방 번호 배열 초기화
+			}
+		}
+
+		// 1. 이 성에 있는 방의 개수 구하기
+		int room_cnt = 0;
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < m; j++) {
+				if(room_idx[i][j] == -1) {
+					// 2-1. 각 방의 넓이 구하기
+					int size = bfs(i, j, room_cnt);
+					room_size[room_cnt] = size; // 방 넓이 저장
+					room_cnt += 1; // 방 개수 카운트
+					// 2-2. 가장 넓은 방의 넓이 구하기
+					max_size = Math.max(max_size, size);
+				}
+			}
+		}
+		
+		System.out.println(room_cnt); // 방 개수 출력
+		System.out.println(max_size); // 가장 넓은 방 넓이 출력
+
+		max_size = 0;
+		// 3. 하나의 벽 제거 후 방 넓이 최대값 구하기
+		for(int x = 0; x < n; x++) {
+			for(int y = 0; y < m; y++) {
+				for(int d = 0; d < 4; d++) {
+					int nx = x + dx[d];
+					int ny = y + dy[d];
+					// d방향에 벽이 없다면 무시
+					if((map[x][y] & (1<<d)) == 0) continue;
+					
+					if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+					
+					// 현재 칸과 다음 칸이 같은 방이라면
+					if(room_idx[x][y] == room_idx[nx][ny]) continue;
+					
+					// d방향에 벽이 있고, 현재 칸과 다음 칸이 다른 방인 경우 벽을 부수고 방 넓이 더하기
+					int size = room_size[room_idx[x][y]] + room_size[room_idx[nx][ny]];
+					max_size = Math.max(max_size, size);
+				}
+			}
+		}
+
+		// 하나의 벽 제거 후 가장 넓은 방 크기 출력
+		System.out.println(max_size);
+	}
+}
+
+class Node {
+	int x;
+	int y;
+
+	Node(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
