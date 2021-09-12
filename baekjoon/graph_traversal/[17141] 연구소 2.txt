@@ -1,0 +1,137 @@
+import java.util.*;
+import java.io.*;
+
+// m개의 바이러스 놓을 것
+// 상하좌우 인접 칸으로 동시에 복제, 1초 걸림
+// 모든 빈 칸에 바이러스를 퍼뜨리는 최소 시간
+// 모든 빈 칸에 바이러스를 퍼뜨릴 수 없으면 -1 출력
+public class Main {
+	public static int n, m, ans = Integer.MAX_VALUE;
+	public static int[][] map;
+	public static int[][] time; // 걸린 시간
+	// 바이러스를 놓을 수 있는 칸의 리스트
+	public static ArrayList<Node> virus_list = new ArrayList<>();
+
+	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dy = {0, 0, -1, 1};
+	
+	public static void getMinTime() {
+		// 모든 빈 칸에 바이러스를 퍼뜨리는 데 걸리는 시간(모든 칸을 bfs 탐색하는 데 걸리는 시간)
+		int tmp = 0;
+		
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				// 벽인 경우 무시
+				if(map[i][j] == 1) continue;
+				
+				// 방문할 수 없는 빈 칸이 존재하는 경우
+				if(time[i][j] == -1) return;
+				
+				tmp = Math.max(tmp, time[i][j]);
+ 			}
+		}
+		
+		// 최소 시간 갱신
+		ans = Math.min(ans, tmp);
+	}
+	
+	// 바이러스 퍼뜨리
+	public static void bfs() {
+		// 시간 저장 배열 초기화 (방문하지 않은 칸을 -1로 표시하기 위해)
+		for(int i = 0; i < n; i++) {
+			Arrays.fill(time[i], -1);
+		}
+		
+		Queue<Node> q = new LinkedList<>();
+		
+		// 바이러스는 각 위치에서 동시에 퍼져야 하므로 바이러스가 있는 칸을 먼저 큐에 넣기
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				if(map[i][j] == 3) {
+					q.offer(new Node(i, j));
+					time[i][j] = 0;
+				}
+			}
+		}
+		
+		while(!q.isEmpty()) {
+			Node now = q.poll();
+			int x = now.x;
+			int y = now.y;
+			
+			for(int i = 0; i < 4; i++) {
+				int nx = x + dx[i];
+				int ny = y + dy[i];
+				
+				if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
+				
+				if(map[nx][ny] == 1) continue;
+				
+				if(time[nx][ny] == -1) {
+					q.offer(new Node(nx, ny));
+					time[nx][ny] = time[x][y] + 1;
+				}
+			}
+		}
+	}
+	
+	// idx: idx번째 칸에 바이러스를 놓을지 말지 결정
+	// cnt: 현재까지 바이러스를 놓은 칸의 수
+	public static void putVirus(int idx, int cnt) {
+		if(cnt == m) { // m개를 모두 선택한 경우
+			bfs(); // 바이러스 퍼뜨리기
+			getMinTime(); // 최소 시간 비교
+			return;
+		}
+		
+		if(idx >= virus_list.size()) return;
+
+		// idx번째 칸의 좌표
+		int x = virus_list.get(idx).x;
+		int y = virus_list.get(idx).y;
+		
+		// idx번째 칸에 바이러스를 놓는 경우
+		map[x][y] = 3;
+		putVirus(idx + 1, cnt + 1);
+		map[x][y] = 2; // 되돌리기
+		
+		// idx번째 칸에 바이러스를 놓지 않는 경우
+		putVirus(idx + 1, cnt);
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		map = new int[n][n];
+		time = new int[n][n];
+		
+		for(int i = 0; i < n; i++) {
+			st = new StringTokenizer(br.readLine());
+			for(int j = 0; j < n; j++) {
+				map[i][j] = Integer.parseInt(st.nextToken());
+				
+				if(map[i][j] == 2) virus_list.add(new Node(i, j));
+			}
+		}
+		
+		// 바이러스를 놓을 수 있는 칸 중 m개의 칸에 바이러스 놓기
+		putVirus(0, 0);
+		
+		if(ans == Integer.MAX_VALUE)
+			System.out.println(-1);
+		else
+			System.out.println(ans);
+	}
+}
+
+class Node {
+	int x;
+	int y;
+	
+	Node(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
