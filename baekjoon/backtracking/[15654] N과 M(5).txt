@@ -1,15 +1,19 @@
 import java.util.*;
+import java.io.*;
+
+// 선택된 수의 순서는 달라도 됨 (1 2 또는 2 1) -> 순서 풀이 o, 선택 풀이 불가(오름차순 아니므로)
+// 중복 허용 x, 사전 순 출력
 
 public class Main {
-	public static int[] numArr; // 입력받은 수
-	public static int[] arr; // 수열
-	public static boolean[] check; // 중복 체크
+	public static int n, m;
+	public static int[] num, arr; // num: 입력받은 수, arr: 수열
+	public static boolean[] check; // 수 사용 여부
 	public static StringBuilder sb = new StringBuilder();
-		
-	public static void recur(int idx, int n, int m) {
-		if(idx == m) {
+
+	public static void recur(int cnt) {
+		if(cnt == m) {
 			for(int i = 0; i < m; i++) {
-				sb.append(numArr[arr[i]] + " ");
+				sb.append(num[arr[i]]).append(" ");
 			}
 			sb.append("\n");
 			return;
@@ -17,32 +21,33 @@ public class Main {
 		
 		for(int i = 0; i < n; i++) {
 			if(check[i]) continue;
-			
+			// 현재 수 num[i] 선택 o
+			arr[cnt] = i;
 			check[i] = true;
-			arr[idx] = i;
-			recur(idx + 1, n, m);
+			recur(cnt + 1);
+			
+			// 현재 수 num[i] 선택 x
 			check[i] = false;
 		}
-		
 	}
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int n = sc.nextInt();
-		int m = sc.nextInt();
-		numArr = new int[n];
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		num = new int[n];
 		arr = new int[m];
 		check = new boolean[n];
 		
+		st = new StringTokenizer(br.readLine());
 		for(int i = 0; i < n; i++) {
-			numArr[i] = sc.nextInt();
+			num[i] = Integer.parseInt(st.nextToken());
 		}
 		
-		// 사전 순으로 증가하는 순서로 출력해야 함
-		Arrays.sort(numArr);
+		Arrays.sort(num);
 		
-		recur(0, n, m);
+		recur(0);
 		System.out.println(sb);
 	}
-
 }
