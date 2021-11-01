@@ -1,14 +1,15 @@
 import java.util.*;
+import java.io.*;
 
 public class Main {
-	public static int n, m, k;
-	public static int ans = Integer.MIN_VALUE;
+	
+	public static int n, m, k, ans = Integer.MIN_VALUE;
 	public static int[][] board;
-	public static boolean[][] choose;
+	public static boolean[][] check;
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
 	
-	// px: 이전에 선택한 칸의 x좌표, py: 아전에 선택한 칸의 y좌표
+	// 이전에 선택한 칸을 기준으로
 	public static void recur(int px, int py, int cnt, int sum) {
 		if(cnt == k) {
 			if(ans < sum) ans = sum;
@@ -16,43 +17,54 @@ public class Main {
 		}
 		
 		for(int x = px; x < n; x++) {
-			// x == px일 때 py+1부터 진행할 경우 처음(0,0)은 확인하지 않게 됨
+			// 확인할 칸의 x 좌표가 px일 때 y의 시작 좌표를 py가 아닌 py+1부터 진행할 경우
+			// main에서 recur을 처음 호출하는 경우 즉, recur(0, 0, 0, 0)에서 board[0][0]칸은 확인하지 않게 된다.
 			for(int y = (x == px ? py : 0); y < m; y++) {
-				if(choose[x][y]) continue;
+				if(check[x][y]) continue;
 				
-				boolean check = true;
+				// 인접 칸 확인
+				boolean ok = true;
 				for(int i = 0; i < 4; i++) {
 					int nx = x + dx[i];
 					int ny = y + dy[i];
+
 					if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-					if(choose[nx][ny]) check = false;
+					
+					if(check[nx][ny]) {
+						ok = false;
+						break;
+					}
 				}
 				
-				if(check) {
-					choose[x][y] = true;
-					recur(x, y, cnt + 1, sum + board[x][y]);
-					choose[x][y] = false;
-				}
+				// 인접 칸이 선택한 칸이라면 다음 칸 확인
+				if(!ok) continue;
+				
+				// 현재 칸 board[x][y]를 합에 더하는 경우
+				check[x][y] = true;
+				recur(x, y, cnt + 1, sum + board[x][y]);
+				// 현재 칸 borad[x][y]를 합에 더하지 않고 넘어가는 경우 -> 다음 반복문
+				check[x][y] = false;
 			}
 		}
 	}
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt();
-		m = sc.nextInt();
-		k = sc.nextInt();
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		k = Integer.parseInt(st.nextToken());
 		board = new int[n][m];
-		choose = new boolean[n][m];
+		check = new boolean[n][m];
 		
 		for(int i = 0; i < n; i++) {
+			st = new StringTokenizer(br.readLine());
 			for(int j = 0; j < m; j++) {
-				board[i][j] = sc.nextInt();
+				board[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
 		
 		recur(0, 0, 0, 0);
 		System.out.println(ans);
 	}
-
 }
