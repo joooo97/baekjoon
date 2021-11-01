@@ -1,49 +1,43 @@
 import java.util.*;
+import java.io.*;
 
+// 중복x , 오름차순
 public class Main {
 	
-	public static int[] num; // 숫자
-	public static int[] arr; // 수열
+	public static int n, m;
+	public static int[] nums, arr;
 	public static StringBuilder sb = new StringBuilder();
 	
-	public static void com(int index, int selected, int n, int m) {
-		if(selected == m) {
+	public static void recur(int cnt, int start) {
+		if(cnt == m) {
 			for(int i = 0; i < m; i++) {
-				sb.append(num[arr[i]] + " ");
+				sb.append(nums[arr[i]]).append(" ");
 			}
 			sb.append("\n");
 			return;
 		}
 		
-		// 1 ~ n까지의 수가 아니라
-		// num[0] ~ num[n - 1]의 수가 주어진 것이므로
-		// if(index > n) return; 이 아님
-		if(index >= n) return;
-		
-		// 현재 수를 선택하는 경우
-		arr[selected] = index;
-		com(index + 1, selected + 1, n, m);
-		
-		// 현재 수를 선택하지 않는 경우
-		arr[selected] = 0;
-		com(index + 1, selected, n, m);
-		
+		for(int i = start; i < n; i++) {
+			arr[cnt] = i;
+			recur(cnt + 1, i + 1);
+		}
 	}
-   
-    public static void main(String[] args){
-    	Scanner sc = new Scanner(System.in);
-    	int n = sc.nextInt();
-    	int m = sc.nextInt();
-    	num = new int[n];
-    	arr = new int[m];
-        
-        for(int i = 0; i < n; i++) {
-        	num[i] = sc.nextInt();
-        }
-        
-        Arrays.sort(num);
-        
-        com(0, 0, n, m);
-        System.out.println(sb);
-    }
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		nums = new int[n];
+		arr = new int[m];
+
+		st = new StringTokenizer(br.readLine());
+		for(int i = 0; i < n; i++) {
+			nums[i] = Integer.parseInt(st.nextToken());
+		}
+		
+		Arrays.sort(nums);
+		recur(0, 0);
+		System.out.println(sb);
+	}
 }
