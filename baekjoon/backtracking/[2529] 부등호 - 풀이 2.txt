@@ -1,57 +1,72 @@
 import java.util.*;
+import java.io.*;
 
 public class Main {
 	public static int k;
-	public static char[] arr; // 부등호 배열
-	public static boolean[] check = new boolean[10]; // 중복 체크 배열
-	public static ArrayList<String> ans = new ArrayList<>();
-
-	// 숫자 x와 y가 부등호 c의 관계를 만족하는지 여부
-	public static boolean ok(int x, int y, char c) {
-		if(c == '<') {
-			if(x < y) return true; 
-		}
+	public static long max = Long.MIN_VALUE, min = Long.MAX_VALUE;
+	public static String max_str, min_str; // 출력할 정답
+	public static char[] sign; // 부등호 배열
+	public static boolean[] check = new boolean[10]; // 숫자 사용 여부
+	
+	public static void getMaxAndMin(String str) {
+		long num = Long.parseLong(str);
 		
-		if(c == '>') {
-			if(x > y) return true;
+		if(max < num) {
+			max = num;
+			max_str = str;
+		}
+		if(min > num) {
+			min = num;
+			min_str = str;
+		}
+	}
+	
+	// idx: 숫자를 선택할 자리의 인덱스
+	public static boolean possible(int idx, int num, String str) {
+		if(idx == 0) return true;
+		
+		char c = sign[idx - 1]; // 부등호
+		long prev = str.charAt(idx - 1) - '0';// 비교할 이전 자리 숫자
+		
+		if(c == '<') {
+			if(prev < num) return true;
+		} else {
+			if(prev > num) return true;
 		}
 		
 		return false;
 	}
-	
-	public static void recur(int idx, String num) {
+
+	// idx자리의 숫자를 정할 것
+	public static void recur(int idx, String str) {
 		if(idx == k + 1) {
-			ans.add(num);
+			getMaxAndMin(str); // 최대값, 최소값 구하기
 			return;
 		}
 		
 		for(int i = 0; i <= 9; i++) {
-			if(check[i]) continue; // 수가 중복된 경우 건너뛰기
+			if(check[i]) continue; // 숫자를 사용했다면 넘어가기
 			
-			// idx가 0일 때는 앞에 비교할 수가 없으므로 수 넣기
-			// idx가 0 이상일 경우 전의 수와 비교
-			if(idx == 0 || ok(num.charAt(idx - 1) - '0', i, arr[idx - 1])) {
+			if(possible(idx, i, str)) {
 				check[i] = true;
-				recur(idx + 1, num + i);
+				recur(idx + 1, str + String.valueOf(i));
 				check[i] = false;
 			}
 		}
 	}
 	
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		k = sc.nextInt();
-		arr = new char[k];
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		k = Integer.parseInt(br.readLine());
+		sign = new char[k];
 		
+		StringTokenizer st = new StringTokenizer(br.readLine());
 		for(int i = 0; i < k; i++) {
-			arr[i] = sc.next().charAt(0);
+			sign[i] = st.nextToken().charAt(0);
 		}
 		
 		recur(0, "");
-		
-		Collections.sort(ans);
-		System.out.println(ans.get(ans.size() - 1));
-		System.out.println(ans.get(0));
-
+		System.out.println(max_str);
+		System.out.println(min_str);
 	}
 }
