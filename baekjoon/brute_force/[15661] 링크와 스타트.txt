@@ -1,60 +1,80 @@
 import java.util.*;
+import java.io.*;
 
 public class Main {
-
 	public static int n, ans = Integer.MAX_VALUE;
 	public static int[][] arr;
-
-	public static void recur(int idx, ArrayList<Integer> first, ArrayList<Integer> second) {
+	public static boolean[] team; // true: 스타트 팀, false: 링크 팀
+	public static int[] start, link;
+	
+	public static void getDifference() {
+		int sum_s = 0;
+		int sum_l = 0;
+		
+		for(int i = 0; i < start.length; i++) {
+			for(int j = 0; j < start.length; j++) {
+				sum_s += arr[start[i]][start[j]];
+			}
+		}
+		
+		for(int i = 0; i < link.length; i++) {
+			for(int j = 0; j < link.length; j++) {
+				sum_l += arr[link[i]][link[j]];
+			}
+		}
+		
+		int diff = Math.abs(sum_s - sum_l);
+		
+		if(ans > diff) ans = diff;
+	}
+	
+	public static void makeTeam(int start_cnt, int link_cnt) {		
+		// 팀 나누기
+		start = new int[start_cnt];
+		link = new int[link_cnt];
+		int idx_s = 0;
+		int idx_l = 0;
+		
+		for(int i = 0; i < n; i++) {
+			if(team[i]) start[idx_s++] = i;
+			else link[idx_l++] = i;
+		}		
+	}
+	
+	public static void recur(int idx, int start_cnt, int link_cnt) {
 		if(idx == n) {
-			if(first.size() == 0 || second.size() == 0) return;
-
-			// 능력치 비교
-			int sum1 = 0;
-			int sum2 = 0;
-			for(int i = 0; i < first.size(); i++) {
-				for(int j = 0; j < first.size(); j++) {
-					sum1 += arr[first.get(i)][first.get(j)];
-				}
-			}
-
-			for(int i = 0; i < second.size(); i++) {
-				for(int j = 0; j < second.size(); j++) {
-					sum2 += arr[second.get(i)][second.get(j)];
-				}
-			}
-
-			int diff = Math.abs(sum1 - sum2);
-			if(diff < ans) ans = diff;
+			// 한 팀이라도 팀원이 0명인 경우 return
+			if(start_cnt == 0 || link_cnt == 0) return;
+			
+			makeTeam(start_cnt, link_cnt);
+			getDifference();
 			return;
 		}
-
-		// idx번 사람을 first팀에 추가
-		first.add(idx);
-		recur(idx + 1, first, second);
-		first.remove(first.size() - 1);
-
-		// idx번 사람을 second팀에 추가
-		second.add(idx);
-		recur(idx + 1, first, second);
-		second.remove(second.size() - 1);
+		
+		// idx번째 팀원을 스타트 팀으로 선택
+		team[idx] = true;
+		recur(idx + 1, start_cnt + 1, link_cnt);
+		
+		// idx번째 팀원을 링크 팀으로 선택
+		team[idx] = false;
+		recur(idx + 1, start_cnt, link_cnt + 1);
 	}
-
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt();
+	
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
 		arr = new int[n][n];
-
+		team = new boolean[n];
+		
+		StringTokenizer st = null;
 		for(int i = 0; i < n; i++) {
+			st = new StringTokenizer(br.readLine());
 			for(int j = 0; j < n; j++) {
-				arr[i][j] = sc.nextInt();
+				arr[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
-
-		ArrayList<Integer> first = new ArrayList<>();
-		ArrayList<Integer> second = new ArrayList<>();
-
-		recur(0, first, second);
+		
+		recur(0, 0, 0);
 		System.out.println(ans);
 	}
 }
