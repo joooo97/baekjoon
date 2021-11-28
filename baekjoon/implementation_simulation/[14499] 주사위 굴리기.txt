@@ -1,28 +1,25 @@
 import java.io.*;
 import java.util.*;
 
-// 처음 주사위의 모든 면은 0
-// 이동한 칸이 0 -> 주사위 바닥면 수가 칸에 복사
-// 이동한 칸이 0 x-> 칸의 수가 주사위 바닥면에 복사, 칸은 0
-// 이동할 때마다 주사위 윗 면의 수 출력
-// 지도 범위 벗어나면 출력 x
-
 public class Main {
-	// 동, 서, 북, 남
+	// 전개도 번호 순서대로 주사위의 값 저장
+	public static int[] dice = new int[6];
+	public static int[][] map;
+	// 동서북남
 	public static int[] dx = {0, 0, -1, 1};
 	public static int[] dy = {1, -1, 0, 0};
-		
+
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+		StringBuilder sb = new StringBuilder(); // 출력할 결과
 		
+		StringTokenizer st = new StringTokenizer(br.readLine());
 		int n = Integer.parseInt(st.nextToken());
 		int m = Integer.parseInt(st.nextToken());
 		int x = Integer.parseInt(st.nextToken());
 		int y = Integer.parseInt(st.nextToken());
 		int k = Integer.parseInt(st.nextToken());
-		int[][] map = new int[n][m];
-		int[] dice = new int[7];
+		map = new int[n][m];
 		
 		for(int i = 0; i < n; i++) {
 			st = new StringTokenizer(br.readLine());
@@ -30,61 +27,66 @@ public class Main {
 				map[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
-		
+
 		st = new StringTokenizer(br.readLine());
-		StringBuilder sb = new StringBuilder();
-		
 		while(k-- > 0) {
+			// 명령의 방향
 			int d = Integer.parseInt(st.nextToken()) - 1;
-			
-			// 주사위의 다음 이동 위치
+
+			// 주사위 이동 후 위치
 			int nx = x + dx[d];
 			int ny = y + dy[d];
-			
-			// 다음 이동 위치가 지도의 범위를 벗어나면 무시
+
+			// 지도 범위를 벗어나는 경우 무시
 			if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
 			
-			// 주사위 이동 (주사위 굴리기)
+			// 1. 주사위 굴리기
+			// 주사위 이동
 			x = nx;
 			y = ny;
 			
-			// 주사위 굴린 후 주사위 면의 변경
-			if(d == 0) { // 동쪽
+			// 굴린 방향에 따른 값 변경
+			if(d == 0) { // 동
+				int tmp = dice[3];
+				dice[3] = dice[0];
+				dice[0] = dice[2];
+				dice[2] = dice[5];
+				dice[5] = tmp;
+			} 
+			else if(d == 1) { // 서
+				int tmp = dice[3];
+				dice[3] = dice[5];
+				dice[5] = dice[2];
+				dice[2] = dice[0];
+				dice[0] = tmp;
+			}
+			else if(d == 2) { // 북
+				int tmp = dice[5];
+				dice[5] = dice[4];
+				dice[4] = dice[0];
+				dice[0] = dice[1];
+				dice[1] = tmp;
+			}
+			else if(d == 3) { // 남
 				int tmp = dice[1];
-				dice[1] = dice[4];
-				dice[4] = dice[6];
-				dice[6] = dice[3];
-				dice[3] = tmp;
-			} else if(d == 1) { // 서쪽
-				int tmp = dice[1];
-				dice[1] = dice[3];
-				dice[3] = dice[6];
-				dice[6] = dice[4];
-				dice[4] = tmp;
-			} else if(d == 2) { // 북쪽
-				int tmp = dice[1];
-				dice[1] = dice[5];
-				dice[5] = dice[6];
-				dice[6] = dice[2];
-				dice[2] = tmp;
-			} else { // 남쪽
-				int tmp = dice[1];
-				dice[1] = dice[2];
-				dice[2] = dice[6];
-				dice[6] = dice[5];
+				dice[1] = dice[0];
+				dice[0] = dice[4];
+				dice[4] = dice[5];
 				dice[5] = tmp;
 			}
-			
-			// 이동한 칸에 따른 수 변경
-			if(map[x][y] == 0) {
-				map[x][y] = dice[6]; // 주사위 바닥 면의 수가 칸에 복사됨
-			} else {
-				dice[6] = map[x][y]; // 칸의 수를 주사위 바닥 면에 복사
+
+			// 2. 이동 후 칸의 값 확인 후 값 변경
+			// 2-1. 칸의 수가 0이면 주사위 바닥면의 수를 칸에 복사
+			if(map[x][y] == 0)
+				map[x][y] = dice[5];
+			else {
+				// 2-2. 0이 아닌 경우 칸의 수를 주사위 바닥면으로 복사
+				dice[5] = map[x][y];
 				map[x][y] = 0;
 			}
 			
-			// 주사위 윗 면의 수 출력
-			sb.append(dice[1] + "\n");
+			// 3. 주사위 윗 면의 수를 출력
+			sb.append(dice[0]).append("\n");
 		}
 		
 		System.out.println(sb);
