@@ -1,84 +1,92 @@
 import java.util.*;
+import java.io.*;
 
-class Node {
+// 하루가 지나면 익은 토마토와 인접한 익지 않은 토마토는 익음
+// 며칠 후 모든 토마토가 다 익게되는지
+// 1: 익음, 0: 익지 않음, -1: 없음
+
+class Tomato {
 	int x;
 	int y;
-	int day;
-
-	Node(int x, int y, int day) {
+	
+	Tomato(int x, int y) {
 		this.x = x;
 		this.y = y;
-		this.day = day;
 	}
 }
 
 public class Main {
+	public static int m, n, ans = 0;
+	public static int[][] box;
+	public static int[][] d;
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
-
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		int m = sc.nextInt();
-		int n = sc.nextInt();
-		int[][] board = new int[n][m];
-
-		Queue<Node> q = new LinkedList<>();
-
-		int cnt = 0; // 처음부터 익었거나 존재하지 않은 토마토의 개수(1 / -1)
-		for(int i = 0; i < n; i++) {
-			for(int j = 0; j < m; j++) {
-				board[i][j] = sc.nextInt();
-
-				if(board[i][j] == 1) {
-					q.offer(new Node(i, j, 0)); // 익은 토마토인 경우 큐에 넣기
-					cnt += 1;
-				}
-				else if(board[i][j] == -1) cnt += 1;
-			}
-		}
-
-		// 처음부터 토마토가 모두 익은 경우
-		if(cnt == n * m) {
-			System.out.println(0);
-			System.exit(0);
-		}
-
+	public static Queue<Tomato> q = new LinkedList<>();
+	
+	public static void bfs() {
 		while(!q.isEmpty()) {
-			Node now = q.poll(); // 익은 토마토를 꺼내기
-			int x = now.x;
-			int y = now.y;
-			int day = now.day;
-
+			Tomato t = q.poll();
+			int x = t.x;
+			int y = t.y;
+			ans = d[x][y];
+			
 			for(int i = 0; i < 4; i++) {
 				int nx = x + dx[i];
 				int ny = y + dy[i];
-
+				  
 				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-
-				if(board[nx][ny] == 0) { // 안 익은 토마토라면
-					board[nx][ny] =  day + 1; // 일수 기록
-					q.offer(new Node(nx, ny, day + 1));
+				
+				// 익지 않았고 방문하지 않았다면
+				if(box[nx][ny] == 0 && d[nx][ny] == 0) {
+					q.offer(new Tomato(nx, ny));
+					d[nx][ny] = d[x][y] + 1; 
 				}
 			}
 		}
-
-		// 일수 확인
-		int ans = 0;
+	}
+ 
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		m = Integer.parseInt(st.nextToken());
+		n = Integer.parseInt(st.nextToken());
+		box = new int[n][m];
+		d = new int[n][m];
+						
+		// 처음부터 모두 익은 상태인지 검사
+		// - 토마토는 최소 1개가 주어지기 때문에 익지 않은 토마토가 있는 경우 false로 체크
+		// -> 입력 종료 후 check가 그대로 true라면 처음부터 모두 익은 상태
+		// -> 입력 종료 후 check가 false라면 익지 않은 토마토가 존재
+		boolean check = true;
 		for(int i = 0; i < n; i++) {
+			st = new StringTokenizer(br.readLine());
 			for(int j = 0; j < m; j++) {
-				if(ans < board[i][j]) ans = board[i][j];
+				box[i][j] = Integer.parseInt(st.nextToken());
+				// 익지 않은 토마토가 있는지 확인
+				if(box[i][j] == 0) check = false;
+				// 익은 토마토는 큐에 담아주기
+				// - 하루가 지날 때마다 토마토가 동시에 익기 때문에 익은 토마토의 위치를 먼저 큐에 담아줘야 함
+				if(box[i][j] == 1) q.offer(new Tomato(i, j));
 			}
 		}
-
-		// 모두 익지 못하는 상황인지 확인
+		
+		// 처음부터 모두 익은 상태
+		if(check) {
+			System.out.println(0);
+			System.exit(0);
+		}
+		
+		bfs();
+		
+		// 탐색 종료 후 익지 않은 토마토가 하나라도 존재하는지 확인
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < m; j++) {
-				if(board[i][j] == 0) // 안 익은 토마토가 존재한다면
-					ans = -1;
+				// 익지 않은 토마토이고, 일 수가 기록되지 않았다면
+				if(box[i][j] == 0 && d[i][j] == 0) ans = -1;
 			}
 		}
-
+		
 		System.out.println(ans);
 	}
-
+	
 }
