@@ -1,0 +1,90 @@
+import java.io.*;
+
+public class Main {
+	public static int n, ans;
+	public static char[][] board;
+
+	// 가장 긴 연속 부분(행, 열)의 사탕 개수 구하기
+	public static void getMaxCnt(int sx, int sy, int ex, int ey) {
+		// 행 부분 구하기
+		for(int i = sx; i <= ex; i++) {
+			char cur = board[i][0];
+			int cnt = 1;
+			for(int j = 1; j < n; j++) {
+				char next = board[i][j];
+				
+				if(cur == next)
+					cnt += 1;
+				else {
+					ans = Math.max(ans, cnt);
+					cur = next;
+					cnt = 1;
+				}
+			}
+			// 마지막 열의 사탕이 이전 열의 사탕과 색이 같은 경우 최대 사탕 개수 갱신
+			ans = Math.max(ans, cnt);
+		}
+
+		// 열 부분 구하기
+		for(int j = sy; j <= ey; j++) {
+			char cur = board[0][j];
+			int cnt = 1;
+			for(int i = 1; i < n; i++) {
+				char next = board[i][j];
+				
+				if(cur == next)
+					cnt += 1;
+				else {
+					ans = Math.max(ans, cnt);
+					cur = next;
+					cnt = 1;
+				}
+			}
+			// 마지막 행의 사탕이 이전 행의 사탕과 색이 같은 경우 최대 사탕 개수 갱신
+			ans = Math.max(ans, cnt);
+		}
+	}
+
+	public static void exchangeCandy(int x, int y, int nx, int ny) {
+		char tmp = board[x][y];
+		board[x][y] = board[nx][ny];
+		board[nx][ny] = tmp;
+	}
+
+	// 현재 칸에 인접한 우,하 위치의 칸만 확인
+	public static void chooseCandy(int x, int y) {
+		// 우 위치의 칸 확인
+		if(y + 1 < n) {
+			exchangeCandy(x, y, x, y + 1); // 사탕 교환
+			getMaxCnt(x, y, x, y + 1); // 먹을 수 있는 사탕 개수 구하기
+			exchangeCandy(x, y, x, y + 1); // 사탕 되돌려 놓기
+		}
+		
+		// 하 위치의 칸 확인
+		if(x + 1 < n) {
+			exchangeCandy(x, y, x + 1, y); // 사탕 교환
+			getMaxCnt(x, y, x + 1, y); // 먹을 수 있는 사탕 개수 구하기
+			exchangeCandy(x, y, x + 1, y); // 사탕 되돌려 놓기
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
+		board = new char[n][n];
+
+		for(int i = 0; i < n; i++) {
+			String line = br.readLine();
+			for(int j = 0; j < n; j++) {
+				board[i][j] = line.charAt(j);
+			}
+		}
+
+		for(int i = 0; i < n; i++) {
+			for(int j = 0; j < n; j++) {
+				chooseCandy(i, j);
+			}
+		}
+		System.out.println(ans);
+	}
+}
