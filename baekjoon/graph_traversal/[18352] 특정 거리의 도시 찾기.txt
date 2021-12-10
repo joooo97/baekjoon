@@ -3,14 +3,14 @@ import java.util.*;
 
 public class Main {
 	public static int n, m, k, x;
-	public static int[] d;
+	public static int[] dist;
 	public static ArrayList<ArrayList<Integer>> graph = new ArrayList<>();
 	public static ArrayList<Integer> list = new ArrayList<>();
 	
-	public static void bfs(int sx) {
+	public static void bfs(int x) {
 		Queue<Integer> q = new LinkedList<>();
-		q.offer(sx);
-		d[sx] = 0;
+		q.offer(x);
+		dist[x] = 0;
 		
 		while(!q.isEmpty()) {
 			int now = q.poll();
@@ -18,9 +18,9 @@ public class Main {
 			for(int i = 0; i < graph.get(now).size(); i++) {
 				int next = graph.get(now).get(i);
 				
-				if(d[next] == -1) {
-					q.offer(next); // 방문 
-					d[next] = d[now] + 1; // 거리 기록
+				if(dist[next] == -1) {
+					q.offer(next); // 방문
+					dist[next] = dist[now] + 1; // 최단 거리 기록
 				}
 			}
 		}
@@ -33,13 +33,12 @@ public class Main {
 		m = Integer.parseInt(st.nextToken());
 		k = Integer.parseInt(st.nextToken());
 		x = Integer.parseInt(st.nextToken());
-		d = new int[n + 1];
+		dist = new int[n + 1];
 		
-				
 		// 그래프, 최단 거리 배열 초기화
 		for(int i = 0; i <= n; i++) {
 			graph.add(new ArrayList<Integer>());
-			Arrays.fill(d, -1);
+			dist[i] = -1;
 		}
 		
 		// 간선 연결
@@ -51,23 +50,24 @@ public class Main {
 		}
 		
 		bfs(x);
-		
+
 		// 최단 거리가 k인 도시 찾기
 		for(int i = 1; i <= n; i++) {
-			if(d[i] == k) list.add(i);
+			if(dist[i] == k) list.add(i);
 		}
-		
-		Collections.sort(list);		
-		
-		StringBuilder sb = new StringBuilder();
+
 		if(list.size() == 0) {
 			System.out.println(-1);
 		} else {
-			for(int i = 0; i < list.size(); i++) {
-				sb.append(list.get(i)).append("\n");
+			Collections.sort(list);
+			StringBuilder sb = new StringBuilder();
+			
+			for(int i : list) {
+				sb.append(i).append("\n");
 			}
 			System.out.println(sb);
 		}
+		
 	}
 
 }
