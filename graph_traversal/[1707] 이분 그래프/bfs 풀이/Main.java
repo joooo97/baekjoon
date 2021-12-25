@@ -9,22 +9,22 @@ public class Main {
 		Queue<Integer> q = new LinkedList<>();
 		q.offer(start);
 		group[start] = 1; // 그룹 지정, 방문 처리
-
+		
 		while(!q.isEmpty()) {
 			int now = q.poll();
 			int g = group[now];
-
+			
 			for(int i = 0; i < graph.get(now).size(); i++) {
 				int next = graph.get(now).get(i);
-
+				
+				// 인접 노드와 그룹이 같다면 이분 그래프가 아님
+				if(group[next] == g) return false;
+				
 				// 인접 노드가 그룹이 없다면 현재 노드와 다른 그룹으로 지정
 				if(group[next] == 0) {
 					q.offer(next);
-					group[next] = 3 - g; // 그룹 지정, 방문 처리
+					group[next] = 3 - g;
 				}
-				// 인접 노드와 그룹이 같다면 이분 그래프가 아닌 것
-				else if(group[next] == g)
-					return false;
 			}
 		}
 		return true;
@@ -62,8 +62,8 @@ public class Main {
 			boolean check = true; 
 			// 연결 그래프가 아닌 단절 그래프일 수도 있으므로 
 			// bfs를 한 번만 진행하는 것이 아닌 for문을 돌며 모든 정점에 대해 진행
-			for(int i = 1; i <= V; i++) {		
-				// check == true일 때만 bfs 진행한다면 시간을 조금 더 줄일 수 있음
+			for(int i = 1; i <= V; i++) {
+				// check == false라면 이분그래프가 아니므로 더이상 bfs 진행 x
 				if(group[i] == 0 && check) {
 					if(!bfs(i)) check = false;
 				}
