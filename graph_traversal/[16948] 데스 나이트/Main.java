@@ -12,16 +12,15 @@ class Node {
 }
 
 public class Main {
-	public static int n;
-	public static int[][] dist;
+	public static int n, r1, c1, r2, c2;
+	public static int[][] d;
 
 	public static int[] dx = {-2, -2, 0, 0, 2, 2};
 	public static int[] dy = {-1, 1, -2, 2, -1, 1};
 	
-	public static void bfs(int r, int c) {
+	public static void bfs() {
 		Queue<Node> q = new LinkedList<>();
-		q.offer(new Node(r, c));
-		dist[r][c] = 0;
+		q.offer(new Node(r1, c1));
 		
 		while(!q.isEmpty()) {
 			Node now = q.poll();
@@ -34,9 +33,9 @@ public class Main {
 				
 				if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
 				
-				if(dist[nx][ny] == -1) {
+				if(d[nx][ny] == 0) {
 					q.offer(new Node(nx, ny));
-					dist[nx][ny] = dist[x][y] + 1;
+					d[nx][ny] = d[x][y] + 1;
 				}
 			}
 		}
@@ -45,20 +44,15 @@ public class Main {
 	public static void main(String args[]) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		n = Integer.parseInt(br.readLine());
-		dist = new int[n][n];
+		d = new int[n][n];
 		
 		StringTokenizer st = new StringTokenizer(br.readLine());	
-		int r1 = Integer.parseInt(st.nextToken());
-		int c1 = Integer.parseInt(st.nextToken());
-		int r2 = Integer.parseInt(st.nextToken());
-		int c2 = Integer.parseInt(st.nextToken());
+		r1 = Integer.parseInt(st.nextToken());
+		c1 = Integer.parseInt(st.nextToken());
+		r2 = Integer.parseInt(st.nextToken());
+		c2 = Integer.parseInt(st.nextToken());
 		
-		for(int i = 0; i < n; i++) {
-			Arrays.fill(dist[i], -1);
-		}
-		
-		bfs(r1, c1);
-		
-		System.out.println(dist[r2][c2]);
+		bfs();
+		System.out.println(d[r2][c2] == 0 ? -1 : d[r2][c2]);
 	}
 }
