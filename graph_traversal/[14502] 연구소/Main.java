@@ -1,80 +1,80 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
-// 벽 3개 세우기
-// 0: 빈칸, 1: 벽, 2: 바이러스
-// 안전 영역 크기의 최댓값
 public class Main {
 	public static int n, m, ans;
-	public static int[][] map, copy;
+	public static int[][] map, copy_map;
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
-
-	public static void countCnt() {
-		int cnt = 0;
+	
+	// 안전 영역 크기 구하기
+	public static int getSizeOfSafeZone() {
+		int size = 0;
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < m; j++) {
-				if(copy[i][j] == 0) cnt += 1;
+				if(copy_map[i][j] == 0) size += 1;
 			}
 		}
-		ans = Math.max(ans, cnt);
+		return size;
 	}
-
-	public static void dfs(int x, int y) {		
+	
+	// 바이러스 전파 (dfs 탐색)
+	// - dfs, bfs 둘 다 가능
+	public static void spreadVirus(int x, int y) {
+		copy_map[x][y] = 3; // 전파된 바이러스는 3으로 저장
+		
 		for(int i = 0; i < 4; i++) {
 			int nx = x + dx[i];
 			int ny = y + dy[i];
-
+			
 			if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-
-			if(copy[nx][ny] == 0) {
-				copy[nx][ny] = 3; // 퍼뜨려진 바이러스를 3으로 지정
-				dfs(nx, ny);
-			}
+			
+			if(copy_map[nx][ny] == 0) spreadVirus(nx, ny);
 		}
 	}
 
-	public static void setWalls(int cnt) {
+	
+	public static void makeWall(int cnt) {
 		if(cnt == 3) {
-			// 지도 복사
+			// 현재 지도 복사
 			for(int i = 0; i < n; i++) {
 				for(int j = 0; j < m; j++) {
-					copy[i][j] = map[i][j];
+					copy_map[i][j] = map[i][j];
 				}
 			}
-
-			// 바이러스 퍼뜨리기
+			
+			// 2. 바이러스 전파
+			// 바이러스의 처음 위치(2)를 시작 지점으로 탐색
 			for(int i = 0; i < n; i++) {
 				for(int j = 0; j < m; j++) {
-					// 처음 입력받은 바이러스의 위치에서만 dfs 진행
-					if(copy[i][j] == 2) dfs(i, j);
+					if(copy_map[i][j] == 2) spreadVirus(i, j);
 				}
 			}
-
-			// 안전 영역 계산
-			countCnt();
+			
+			// 3. 최대 안전 영역 크기 갱신
+			ans = Math.max(ans, getSizeOfSafeZone());
+			
 			return;
 		}
-
+				
 		for(int i = 0; i < n; i++) {
 			for(int j = 0; j < m; j++) {
 				if(map[i][j] == 0) {
 					map[i][j] = 1; // 벽 세우기
-					setWalls(cnt + 1);
+					makeWall(cnt + 1);
 					map[i][j] = 0; // 벽 허물기
 				}
 			}
-		}
-
+		}		
 	}
-
+	
 	public static void main(String args[]) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		n = Integer.parseInt(st.nextToken());
 		m = Integer.parseInt(st.nextToken());
 		map = new int[n][m];
-		copy = new int[n][m];
+		copy_map = new int[n][m];
 		
 		for(int i = 0; i < n; i++) {
 			st = new StringTokenizer(br.readLine());
@@ -82,8 +82,10 @@ public class Main {
 				map[i][j] = Integer.parseInt(st.nextToken());
 			}
 		}
-
-		setWalls(0);
+		
+		// 1. 벽 3개 세우기
+		makeWall(0);
+		
 		System.out.println(ans);
 	}
 }
