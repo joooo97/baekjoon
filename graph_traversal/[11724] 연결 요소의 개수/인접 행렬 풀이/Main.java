@@ -1,5 +1,5 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
 	public static int n, m;
@@ -9,12 +9,12 @@ public class Main {
 	public static void dfs(int x) {
 		visited[x] = true;
 		
-		for(int i = 1; i <= n; i++) {
-			if(graph[x][i] == 0 && !visited[i]) dfs(i);
+		for(int y = 1; y <= n; y++) {
+			if(graph[x][y] == 1 && !visited[y]) dfs(y);
 		}
 	}
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String args[]) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		n = Integer.parseInt(st.nextToken());
@@ -24,16 +24,16 @@ public class Main {
 		
 		for(int i = 0; i < m; i++) {
 			st = new StringTokenizer(br.readLine());
-			int a = Integer.parseInt(st.nextToken());
-			int b = Integer.parseInt(st.nextToken());
-			graph[a][b] = graph[b][a] = 1;
+			int u = Integer.parseInt(st.nextToken());
+			int v = Integer.parseInt(st.nextToken());
+			graph[u][v] = graph[v][u] = 1;
 		}
 		
 		int cnt = 0;
 		for(int i = 1; i <= n; i++) {
 			if(!visited[i]) {
 				dfs(i);
-				cnt += 1;
+				cnt++;
 			}
 		}
 		System.out.println(cnt);
