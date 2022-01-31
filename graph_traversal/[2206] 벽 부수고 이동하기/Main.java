@@ -1,52 +1,63 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
-// 0: 이동 가능, 1: 벽
-// 벽을 한 개까지 부술 수 있음
-// 상하좌우 이동
-// (n, m)까지의 최단 경로, 시작 칸과 끝 칸도 포함
+class Node {
+	int x;
+	int y;
+	int cnt; // 현재까지 벽 부순 횟수 (0 또는 1만 가능)
+	int dist; // 현재까지의 이동 거리
+
+	Node(int x, int y, int cnt, int dist) {
+		this.x = x;
+		this.y = y;
+		this.cnt = cnt;
+		this.dist = dist;
+	}
+}
+
 public class Main {
 	public static int n, m;
 	public static int[][] map;
-	// 정점에 도달했을 때 벽을 부순 적이 있는 경우와 부순 적이 없는 경우가 있음 
-	// 3차원 배열로 표현 -> [x좌표][y좌표][벽 부순 횟수: 0/1]
-	public static boolean[][][] visited;
+	public static boolean[][][] visited; // [x좌표][y좌표][(x, y)에 도달했을 때 벽 부순 횟수 - 0 또는 1]
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
 
-	public static void bfs() {
+	public static int bfs() {
 		Queue<Node> q = new LinkedList<>();
-		// 시작 정점에 대해 처리
 		q.offer(new Node(0, 0, 0, 1));
 		visited[0][0][0] = true;
-		
+
 		while(!q.isEmpty()) {
 			Node now = q.poll();
 			int x = now.x;
 			int y = now.y;
 			int cnt = now.cnt;
 			int dist = now.dist;
-			
-			// (n, m) 정점에 도달했다면 종료
+
+			// (n, m) 칸에 도달했다면 종료
+			// - 벽을 부수고 (n, m)에 도달 했을 때와 부수지 않고 (n, m)에 도달하지 않았을 때를 따로 비교하지 않아도 되는 이유는
+			//   bfs 탐색 중 큐에서 꺼내지는 순서가 곧 방문 순서가 되기 때문에 먼저 (n, m)에 도착했다는 뜻(= 최단 경로라는 뜻)
 			if(x == n-1 && y == m-1) {
-				System.out.println(dist);
-				System.exit(0);
+				return dist;
 			}
-			
+
 			for(int i = 0; i < 4; i++) {
 				int nx = x + dx[i];
 				int ny = y + dy[i];
-				
+
 				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-			
-				// 다음 정점이 빈 칸이고, 방문하지 않았다면
-				// 다음 정점이 빈 칸인 경우 벽 부수는 횟수는 변하지 않음
+
+				// 다음 칸이 빈 칸이라면
+				// - 현재까지의 벽 부순 횟수와 상관 없이 이동 가능
+				// - 벽 부순 횟수는 그대로, 이동 거리는 1 증가
 				if(map[nx][ny] == 0) {
 					if(!visited[nx][ny][cnt]) {
 						q.offer(new Node(nx, ny, cnt, dist + 1));
 						visited[nx][ny][cnt] = true;
 					}
-				} else { // 다음 정점이 벽인 경우, 현재 벽을 부순 횟수가 0이어야만 이동 가능
+				} else { // 다음 칸이 벽이라면
+					// - 현재까지 벽 부순 횟수가 0일 때만 부수고 이동할 수 있음
+					// - 벽 부순 횟수는 1로, 이동 거리는 1 증가
 					if(cnt == 0 && !visited[nx][ny][1]) {
 						q.offer(new Node(nx, ny, 1, dist + 1));
 						visited[nx][ny][1] = true;
@@ -54,6 +65,7 @@ public class Main {
 				}
 			}
 		}
+		return -1;
 	}
 
 	public static void main(String args[]) throws IOException {
@@ -70,23 +82,6 @@ public class Main {
 				map[i][j] = line.charAt(j) - '0';
 			}
 		}
-
-		bfs();
-		// 최단거리를 출력하지 못했다면 불가능한 경우인 것
-		System.out.println(-1);
-	}
-}
-
-class Node {
-	int x;
-	int y;
-	int cnt; // 현재까지 벽을 부순 횟수
-	int dist; // 현재까지의 이동 거리
-
-	Node(int x, int y, int cnt, int dist) {
-		this.x = x;
-		this.y = y;
-		this.cnt = cnt;
-		this.dist = dist;
+		System.out.println(bfs());
 	}
 }
