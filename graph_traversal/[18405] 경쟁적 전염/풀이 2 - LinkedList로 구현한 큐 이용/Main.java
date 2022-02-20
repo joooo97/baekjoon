@@ -1,50 +1,42 @@
 import java.io.*;
 import java.util.*;
 
-/*
- * - 1초마다 상,하,좌,우로 증식
- * - 낮은 종류의 바이러스부터 증식 (종류: 1 ~ k)
- * - s초 후에 (x, y)에 존재하는 바이러스의 종류 출력
- *   -> 존재 x: 0 출력
- *   -> 시험관 가장 왼쪽 위: (1, 1)
- */
-
 class Virus implements Comparable<Virus> {
 	int x;
 	int y;
-	int no; // 바이러스 종류
-	int t; // 시간
+	int no;
+	int sec;
 	
-	Virus(int x, int y, int no, int t) {
+	Virus(int x, int y, int no, int sec) {
 		this.x = x;
 		this.y = y;
 		this.no = no;
-		this.t = t;
+		this.sec = sec;
 	}
 	
-	// 0초일 때의 바이러스들만 먼저 큐에 담아주고 bfs를 진행할 것이기 때문에
-	// 바이러스 번호에 대해서만 오름차순 정렬하면 됨
+	// 바이러스 번호순서대로 오름차순 정렬
 	@Override
 	public int compareTo(Virus other) {
-		return this.no - other.no;
+		if(this.no > other.no) return 1;
+		
+		return -1;
 	}
 }
 
 public class Main {
-	public static int n, k, s, x, y;
-	public static int[][] board;
-	public static ArrayList<Virus> list = new ArrayList<Virus>();
+	public static int n, k, s;
+	public static int[][] map;
+	public static ArrayList<Virus> virus_list = new ArrayList<>(); // 처음에 주어진 바이러스
 	public static Queue<Virus> q = new LinkedList<>();
 	
-	public static int[] dx = {-1, 1, 0, 0};
+	public static int[] dx = {-1, 1, 0, -0};
 	public static int[] dy = {0, 0, -1, 1};
 	
 	public static void bfs() {
-		
 		while(!q.isEmpty()) {
 			Virus v = q.poll();
 			
-			if(v.t == s) return;
+			if(v.sec == s) return;
 			
 			for(int i = 0; i < 4; i++) {
 				int nx = v.x + dx[i];
@@ -52,48 +44,50 @@ public class Main {
 				
 				if(nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
 				
-				if(board[nx][ny] == 0) {
-					q.offer(new Virus(nx, ny, v.no, v.t + 1));
-					board[nx][ny] = v.no;
+				if(map[nx][ny] == 0) {
+					map[nx][ny] = v.no; // 바이러스 증식
+					q.offer(new Virus(nx, ny, v.no, v.sec + 1));
 				}
 			}
 		}
 	}
-
+	
 	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		n = Integer.parseInt(st.nextToken());
 		k = Integer.parseInt(st.nextToken());
-		board = new int[n][n];
+		map = new int[n][n];
 		
 		for(int i = 0; i < n; i++) {
 			st = new StringTokenizer(br.readLine());
 			for(int j = 0; j < n; j++) {
-				board[i][j] = Integer.parseInt(st.nextToken());
+				map[i][j] = Integer.parseInt(st.nextToken());
 				
-				// 0초 상태의 바이러스 위치 기록
-				if(board[i][j] != 0)
-					list.add(new Virus(i, j, board[i][j], 0));
+				// 처음에 주어진 바이러스들을 리스트에 담기
+				if(map[i][j] != 0) {
+					virus_list.add(new Virus(i, j, map[i][j], 0));
+				}
 			}
-		}
-		
-		// 바이러스 번호 순서대로 오름차순 정렬 후 큐에 담아주기
-		Collections.sort(list);
-		
-		for(int i = 0; i < list.size(); i++) {
-			Virus v = list.get(i);
-			q.offer(new Virus(v.x, v.y, v.no, v.t));
 		}
 		
 		st = new StringTokenizer(br.readLine());
 		s = Integer.parseInt(st.nextToken());
-		x = Integer.parseInt(st.nextToken());
-		y = Integer.parseInt(st.nextToken());
+		int x = Integer.parseInt(st.nextToken());
+		int y = Integer.parseInt(st.nextToken());
+		
+		// 처음에 주어진 바이러스들을 번호순으로 오름차순 정렬
+		// - 번호가 낮은 바이러스부터 증식해야 하므로
+		Collections.sort(virus_list);
+		
+		// 처음에 주어진 바이러스들을 큐에 옮기기
+		for(int i = 0; i < virus_list.size(); i++) {
+			q.offer(virus_list.get(i));
+		}
 		
 		bfs();
-				
-		// 바이러스 종류 출력
-		System.out.println(board[x-1][y-1]);
+		
+		System.out.println(map[x-1][y-1]);
 	}
+
 }
