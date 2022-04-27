@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 class Node {
 	int x;
@@ -12,10 +13,10 @@ class Node {
 
 public class Main {
 	public static int n, m;
-	public static int[][] board;
+	public static int[][] maze;
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
-	
+
 	public static void bfs(int x, int y) {
 		Queue<Node> q = new LinkedList<>();
 		q.offer(new Node(x, y));
@@ -31,29 +32,31 @@ public class Main {
 				
 				if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
 				
-				if(board[nx][ny] == 1) {
-					board[nx][ny] = board[x][y] + 1;
+				if(maze[nx][ny] == 1) {
 					q.offer(new Node(nx, ny));
+					maze[nx][ny] = maze[x][y] + 1;
 				}
 			}
 		}
 	}
-
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		n = sc.nextInt();
-		m = sc.nextInt();
-		board = new int[n][m];
-
+ 
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		n = Integer.parseInt(st.nextToken());
+		m = Integer.parseInt(st.nextToken());
+		maze = new int[n][m];
+		
 		for(int i = 0; i < n; i++) {
-			String line = sc.next();
+			String line = br.readLine();
 			for(int j = 0; j < m; j++) {
-				board[i][j] = line.charAt(j) - '0';
+				maze[i][j] = line.charAt(j) - '0';
 			}
 		}
 		
 		bfs(0, 0);
-		System.out.println(board[n-1][m-1]);
-	}
+		System.out.println(maze[n-1][m-1]);
 
+	}
+	
 }
