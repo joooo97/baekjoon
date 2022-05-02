@@ -21,7 +21,7 @@ public class Main {
 	// 바이러스 전파 (dfs 탐색)
 	// - dfs, bfs 둘 다 가능
 	public static void spreadVirus(int x, int y) {
-		copy_map[x][y] = 3; // 전파된 바이러스는 3으로 저장
+		copy_map[x][y] = 2;
 		
 		for(int i = 0; i < 4; i++) {
 			int nx = x + dx[i];
