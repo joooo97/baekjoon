@@ -1,20 +1,20 @@
 import java.io.*;
 import java.util.*;
 
-// 구하는 문제: 수빈이가 동생을 찾을 수 있는 가장 빠른 시간
-// - 정점: 수빈이와 동생의 위치
-// - 가중치: 시간이며, 주어진 가중치는 0 또는 1로 다르다.
-//  -> 가중치가 다른 문제에서의 최단 경로를 구하는 문제이다.
-//  -> 가중치가 작은 것부터 먼저 처리해야 한다.(큐에 넣어줘야 함)
+//구하는 문제: 수빈이가 동생을 찾을 수 있는 가장 빠른 시간
+//- 정점: 수빈이와 동생의 위치
+//- 가중치: 시간이며, 주어진 가중치는 0 또는 1로 다르다.
+//-> 가중치가 다른 문제에서의 최단 경로를 구하는 문제이다.
+//-> 가중치가 작은 것부터 먼저 처리해야 한다.(큐에 넣어줘야 함)
 
 class Node {
 	int x;
-	int t;
+	int t; // 걸린 시간
 	
 	Node(int x, int t) {
 		this.x = x;
 		this.t = t;
-	}	
+	}
 }
 
 public class Main {
@@ -27,7 +27,7 @@ public class Main {
 		visited[n] = true;
 		
 		while(!deque.isEmpty()) {
-			Node now = deque.pollFirst(); // poll();
+			Node now = deque.poll();
 			int x = now.x;
 			int t = now.t;
 			
@@ -36,25 +36,24 @@ public class Main {
 				return;
 			}
 			
-			// 순간 이동: 0초 후 2*X로 이동
-			if(2*x <= 100000 && !visited[2*x]) {
-				deque.offerFirst(new Node(2*x, t));
-				visited[2*x] = true;
+			// 0초 후 2*X로 이동
+			if(x * 2 <= 100000 && !visited[x * 2]) {
+				deque.offerFirst(new Node(x * 2, t));
+				visited[x * 2] = true;
 			}
 			
-			// 걷는 경우: 1초 후 X-1 또는 X+1로 이동
-			if(x-1 >= 0 && !visited[x-1]) {
-				deque.offerLast(new Node(x-1, t+1));
-				visited[x-1] = true;
+			// 1초 후 X-1로 이동
+			if(x - 1 >= 0 && !visited[x - 1]) {
+				deque.offerLast(new Node(x - 1, t + 1));
+				visited[x - 1] = true;
 			}
 			
-			if(x+1 <= 100000 && !visited[x+1]) {
-				deque.offerLast(new Node(x+1, t+1));
-				visited[x+1] = true;
+			// 1초 후 X+1로 이동
+			if(x + 1 <= 100000 && !visited[x + 1]) {
+				deque.offerLast(new Node(x + 1, t + 1));
+				visited[x + 1] = true;
 			}
-
 		}
-		
 	}
 	
 	public static void main(String[] args) throws IOException {
