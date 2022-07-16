@@ -1,5 +1,5 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
 	
@@ -9,43 +9,43 @@ public class Main {
 	public static int[] dx = {-1, 1, 0, 0};
 	public static int[] dy = {0, 0, -1, 1};
 	
-	// 이전에 선택한 칸을 기준으로
 	public static void recur(int px, int py, int cnt, int sum) {
 		if(cnt == k) {
-			if(ans < sum) ans = sum;
+			// 최댓값 갱신 후 return
+			ans = Math.max(ans, sum);
 			return;
 		}
 		
+		// px행부터 n-1행까지 확인할 건데 px행을 확인할 때는 py열의 칸부터 확인하고,
+		// px행의 다음 행들을 확인할 때는 0열의 칸부터 확인하기 시작하면 됨
 		for(int x = px; x < n; x++) {
-			// 확인할 칸의 x 좌표가 px일 때 y의 시작 좌표를 py가 아닌 py+1부터 진행할 경우
-			// main에서 recur을 처음 호출하는 경우 즉, recur(0, 0, 0, 0)에서 board[0][0]칸은 확인하지 않게 된다.
-			for(int y = (x == px ? py : 0); y < m; y++) {
+			for(int y = (x == px) ? py : 0; y < m; y++) {
+				// 현재 칸을 이미 선택했다면
 				if(check[x][y]) continue;
 				
 				// 인접 칸 확인
-				boolean ok = true;
-				for(int i = 0; i < 4; i++) {
-					int nx = x + dx[i];
-					int ny = y + dy[i];
+				if(!isChoosable(x, y)) continue;
 
-					if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
-					
-					if(check[nx][ny]) {
-						ok = false;
-						break;
-					}
-				}
-				
-				// 인접 칸이 선택한 칸이라면 다음 칸 확인
-				if(!ok) continue;
-				
-				// 현재 칸 board[x][y]를 합에 더하는 경우
+				// 현재 칸을 선택하는 경우
 				check[x][y] = true;
 				recur(x, y, cnt + 1, sum + board[x][y]);
-				// 현재 칸 borad[x][y]를 합에 더하지 않고 넘어가는 경우 -> 다음 반복문
+				
+				// 현재 칸을 선택하지 않는 경우
 				check[x][y] = false;
 			}
 		}
+	}
+	
+	public static boolean isChoosable(int x, int y) {
+		for(int i = 0; i < 4; i++) {
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			
+			if(nx < 0 || nx >= n || ny < 0 || ny >= m) continue;
+			
+			if(check[nx][ny]) return false;
+		}
+		return true;
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -55,7 +55,7 @@ public class Main {
 		m = Integer.parseInt(st.nextToken());
 		k = Integer.parseInt(st.nextToken());
 		board = new int[n][m];
-		check = new boolean[n][m];
+		check = new boolean[n + 1][m + 1];
 		
 		for(int i = 0; i < n; i++) {
 			st = new StringTokenizer(br.readLine());
@@ -65,6 +65,9 @@ public class Main {
 		}
 		
 		recur(0, 0, 0, 0);
+		
 		System.out.println(ans);
 	}
+	
 }
+
