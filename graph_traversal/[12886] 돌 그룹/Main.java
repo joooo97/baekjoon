@@ -1,48 +1,45 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
-// 크기가 같지 않은 두 그룹을 고른다.
-// x: 돌 개수 작은 쪽, y: 돌 개수 큰 쪽
-// x: x+x, y: y-x
-// 세 그룹의 돌 개수가 모두 같다면 1, 아니면 0 출력
 public class Main {
 	public static int sum, ans;
+	// 두 그룹의 돌 선택 여부 배열. 한 그룹의 돌의 가능한 최대 개수는 1500개
 	public static boolean[][] visited = new boolean[1501][1501];
 	
+	// 두 그룹을 선택하는 과정을 반복
 	public static void dfs(int a, int b, int c) {
-		// 두 그룹 선택의 종료 조건
 		if(a == b && b == c) {
 			ans = 1;
 			return;
 		}
 		
-		// 두 그룹 선택
+		// 두 그룹 고르기
 		compare(a, b);
 		compare(a, c);
 		compare(b, c);
 	}
 	
-	public static void compare(int a, int b) {
-		if(visited[a][b]) return;
+	// 돌 개수 비교
+	public static void compare(int x, int y) {
+		if(visited[x][y]) return;
 		
-		visited[a][b] = visited[b][a] = true;
-		
-		int c = sum - (a + b);
-		int big = Math.max(a, b);
-		int small = Math.min(a, b);
+		visited[x][y] = visited[y][x] = true;
 
-		// 다시 두 그룹을 선택
-		dfs(big - small, small * 2, c);
+		int small = Math.min(x, y);
+		int big = Math.max(x, y);
+		
+		// 변경된 돌 개수로 다시 단계 진행
+		dfs(small * 2, big - small, sum - x - y);
 	}
-	
-	public static void main(String args[]) throws IOException {
+
+	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		StringTokenizer st = new StringTokenizer(br.readLine());
 		int a = Integer.parseInt(st.nextToken());
 		int b = Integer.parseInt(st.nextToken());
 		int c = Integer.parseInt(st.nextToken());
-		sum = a + b + c;
 		
+		sum = a + b + c;
 		if(sum % 3 != 0) {
 			System.out.println(0);
 		} else {
@@ -50,6 +47,6 @@ public class Main {
 			System.out.println(ans);
 		}
 		
-		
 	}
+
 }
